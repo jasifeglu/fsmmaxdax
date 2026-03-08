@@ -32,6 +32,9 @@ const navItems: NavItem[] = [
   { title: "Inventory", url: "/inventory", icon: Package, roles: ["admin"] },
   { title: "Billing", url: "/billing", icon: DollarSign, roles: ["admin", "technician"] },
   { title: "Reports", url: "/reports", icon: BarChart3, roles: ["admin"] },
+  { title: "My Profile", url: "/profile", icon: User, roles: ["admin", "coordinator", "technician"] },
+  { title: "My Performance", url: "/performance", icon: TrendingUp, roles: ["admin", "coordinator", "technician"] },
+  { title: "User Monitoring", url: "/user-monitoring", icon: Eye, roles: ["admin", "coordinator"] },
   { title: "User Management", url: "/users", icon: UserCog, roles: ["admin"] },
   { title: "Settings", url: "/settings", icon: Settings, roles: ["admin"] },
 ];
