@@ -37,7 +37,7 @@ export const PurchaseRequests = ({ items }: Props) => {
           inventory_id: item.id,
           requested_quantity: item.min_stock * 2,
           reason: "low_stock",
-          requested_by: userId,
+          requested_by: user?.id,
           notes: `Auto-suggested: ${item.name} is ${item.status}`,
         });
         created++;
