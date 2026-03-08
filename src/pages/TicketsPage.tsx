@@ -20,6 +20,7 @@ import { WhatsAppPanel } from "@/components/WhatsAppPanel";
 import { SmartDispatchPanel } from "@/components/tickets/SmartDispatchPanel";
 import { Separator } from "@/components/ui/separator";
 import { calculateDistanceCharge, getProductServiceCharge } from "@/lib/distanceChargeUtils";
+import { formatINR } from "@/lib/formatINR";
 
 const CATEGORIES = [
   "General", "AC Repair", "Washing Machine", "Refrigerator", "Installation",
