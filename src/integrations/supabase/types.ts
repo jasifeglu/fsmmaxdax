@@ -779,6 +779,87 @@ export type Database = {
         }
         Relationships: []
       }
+      ticket_comments: {
+        Row: {
+          attachment_urls: string[] | null
+          content: string
+          created_at: string
+          deleted_by: string | null
+          id: string
+          is_deleted: boolean
+          is_edited: boolean
+          is_pinned: boolean
+          is_question: boolean
+          is_resolved: boolean
+          is_urgent: boolean
+          mentions: string[] | null
+          parent_id: string | null
+          requires_response: boolean
+          ticket_id: string
+          updated_at: string
+          user_id: string
+          user_name: string
+          user_role: string
+        }
+        Insert: {
+          attachment_urls?: string[] | null
+          content?: string
+          created_at?: string
+          deleted_by?: string | null
+          id?: string
+          is_deleted?: boolean
+          is_edited?: boolean
+          is_pinned?: boolean
+          is_question?: boolean
+          is_resolved?: boolean
+          is_urgent?: boolean
+          mentions?: string[] | null
+          parent_id?: string | null
+          requires_response?: boolean
+          ticket_id: string
+          updated_at?: string
+          user_id: string
+          user_name?: string
+          user_role?: string
+        }
+        Update: {
+          attachment_urls?: string[] | null
+          content?: string
+          created_at?: string
+          deleted_by?: string | null
+          id?: string
+          is_deleted?: boolean
+          is_edited?: boolean
+          is_pinned?: boolean
+          is_question?: boolean
+          is_resolved?: boolean
+          is_urgent?: boolean
+          mentions?: string[] | null
+          parent_id?: string | null
+          requires_response?: boolean
+          ticket_id?: string
+          updated_at?: string
+          user_id?: string
+          user_name?: string
+          user_role?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ticket_comments_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "ticket_comments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ticket_comments_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ticket_technicians: {
         Row: {
           assignment_type: string
