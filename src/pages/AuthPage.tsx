@@ -10,7 +10,6 @@ import { useToast } from "@/hooks/use-toast";
 const AuthPage = () => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
-  const [googleLoading, setGoogleLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
