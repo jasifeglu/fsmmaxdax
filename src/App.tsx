@@ -25,6 +25,7 @@ import PerformancePage from "./pages/PerformancePage";
 import UserMonitoringPage from "./pages/UserMonitoringPage";
 import TravelExpensesPage from "./pages/TravelExpensesPage";
 import IncentivesPage from "./pages/IncentivesPage";
+import AuditLogsPage from "./pages/AuditLogsPage";
 import { Loader2 } from "lucide-react";
 import type { UserRole } from "@/contexts/AuthContext";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
@@ -73,6 +74,7 @@ const ProtectedRoutes = () => {
         <Route path="/performance" element={<PerformancePage />} />
         <Route path="/user-monitoring" element={<RoleGuard allowed={["admin", "coordinator"]}><UserMonitoringPage /></RoleGuard>} />
         <Route path="/users" element={<RoleGuard allowed={["admin"]}><UsersPage /></RoleGuard>} />
+        <Route path="/audit-logs" element={<RoleGuard allowed={["admin"]}><AuditLogsPage /></RoleGuard>} />
         <Route path="/settings" element={<RoleGuard allowed={["admin"]}><SettingsPage /></RoleGuard>} />
         <Route path="*" element={<NotFound />} />
       </Routes>
