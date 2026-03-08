@@ -1,42 +1,38 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { PageHeader } from "@/components/PageHeader";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Settings as SettingsIcon, Bell, Tag, Receipt, Camera, Loader2 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
+import { Loader2, Building2, Ticket, MapPin, Bell, AlertTriangle, MessageSquare, Package, DollarSign, BarChart3, Lock, Link2, Palette, Database, UserCog } from "lucide-react";
+import { useSettings } from "@/components/settings/SettingsShared";
+import { GeneralSettings } from "@/components/settings/GeneralSettings";
+import { TicketSettings } from "@/components/settings/TicketSettings";
+import { TrackingSettings } from "@/components/settings/TrackingSettings";
+import { ReminderSettings } from "@/components/settings/ReminderSettings";
+import { EscalationSettings } from "@/components/settings/EscalationSettings";
+import { CommunicationSettings } from "@/components/settings/CommunicationSettings";
+import { InventorySettings, BillingSettings, KPISettings } from "@/components/settings/OperationalSettings";
+import { SecuritySettings } from "@/components/settings/SecuritySettings";
+import { IntegrationSettings, AppearanceSettings, DataSettings } from "@/components/settings/SystemSettings";
+import { cn } from "@/lib/utils";
+import { ScrollArea } from "@/components/ui/scroll-area";
+
+const tabs = [
+  { id: "general", label: "General", icon: Building2 },
+  { id: "tickets", label: "Tickets & Workflow", icon: Ticket },
+  { id: "tracking", label: "Tracking", icon: MapPin },
+  { id: "reminders", label: "Reminders", icon: Bell },
+  { id: "escalation", label: "Escalation", icon: AlertTriangle },
+  { id: "communication", label: "Communication", icon: MessageSquare },
+  { id: "inventory", label: "Inventory", icon: Package },
+  { id: "billing", label: "Billing", icon: DollarSign },
+  { id: "kpi", label: "KPI & Performance", icon: BarChart3 },
+  { id: "security", label: "Security", icon: Lock },
+  { id: "integrations", label: "Integrations", icon: Link2 },
+  { id: "appearance", label: "Appearance", icon: Palette },
+  { id: "data", label: "Data Management", icon: Database },
+];
 
 const SettingsPage = () => {
-  const { toast } = useToast();
-  const [settings, setSettings] = useState<Record<string, string>>({});
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-
-  useEffect(() => {
-    const fetchSettings = async () => {
-      setLoading(true);
-      const { data } = await supabase.from("app_settings").select("*");
-      const map: Record<string, string> = {};
-      (data || []).forEach((s: any) => { map[s.key] = s.value; });
-      setSettings(map);
-      setLoading(false);
-    };
-    fetchSettings();
-  }, []);
-
-  const updateSetting = async (key: string, value: string) => {
-    setSettings(prev => ({ ...prev, [key]: value }));
-    const { error } = await supabase
-      .from("app_settings")
-      .update({ value, updated_at: new Date().toISOString() })
-      .eq("key", key);
-    if (error) {
-      toast({ title: "Error saving", description: error.message, variant: "destructive" });
-    }
-  };
+  const { settings, loading, update } = useSettings();
+  const [activeTab, setActiveTab] = useState("general");
 
   if (loading) {
     return (
@@ -44,78 +40,79 @@ const SettingsPage = () => {
     );
   }
 
+  const renderContent = () => {
+    switch (activeTab) {
+      case "general": return <GeneralSettings settings={settings} update={update} />;
+      case "tickets": return <TicketSettings settings={settings} update={update} />;
+      case "tracking": return <TrackingSettings settings={settings} update={update} />;
+      case "reminders": return <ReminderSettings settings={settings} update={update} />;
+      case "escalation": return <EscalationSettings settings={settings} update={update} />;
+      case "communication": return <CommunicationSettings settings={settings} update={update} />;
+      case "inventory": return <InventorySettings settings={settings} update={update} />;
+      case "billing": return <BillingSettings settings={settings} update={update} />;
+      case "kpi": return <KPISettings settings={settings} update={update} />;
+      case "security": return <SecuritySettings settings={settings} update={update} />;
+      case "integrations": return <IntegrationSettings settings={settings} update={update} />;
+      case "appearance": return <AppearanceSettings settings={settings} update={update} />;
+      case "data": return <DataSettings settings={settings} update={update} />;
+      default: return null;
+    }
+  };
+
   return (
-    <div className="max-w-3xl">
-      <PageHeader title="Settings" description="System configuration and preferences" />
+    <div>
+      <PageHeader title="Settings & Configuration" description="Full system control — admin only" />
 
-      <div className="space-y-6">
-        <Card className="glass-card">
-          <CardHeader>
-            <CardTitle className="text-sm font-medium flex items-center gap-2"><Camera className="h-4 w-4" /> Feature Toggles</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium">Selfie Check-In</p>
-                <p className="text-xs text-muted-foreground">Require technicians to take a selfie when checking in</p>
-              </div>
-              <Switch
-                checked={settings.selfie_checkin_enabled === "true"}
-                onCheckedChange={(checked) => updateSetting("selfie_checkin_enabled", checked ? "true" : "false")}
-              />
-            </div>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium">Travel Expense Tracking</p>
-                <p className="text-xs text-muted-foreground">Allow technicians to log travel expenses</p>
-              </div>
-              <Switch
-                checked={settings.travel_expense_enabled === "true"}
-                onCheckedChange={(checked) => updateSetting("travel_expense_enabled", checked ? "true" : "false")}
-              />
-            </div>
-          </CardContent>
-        </Card>
+      <div className="flex gap-6 min-h-[70vh]">
+        {/* Sidebar Navigation */}
+        <div className="w-56 shrink-0 hidden lg:block">
+          <ScrollArea className="h-[70vh]">
+            <nav className="space-y-1 pr-2">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={cn(
+                    "w-full flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors text-left",
+                    activeTab === tab.id
+                      ? "bg-primary/10 text-primary font-medium"
+                      : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                  )}
+                >
+                  <tab.icon className="h-4 w-4 shrink-0" />
+                  <span className="truncate">{tab.label}</span>
+                </button>
+              ))}
+            </nav>
+          </ScrollArea>
+        </div>
 
-        <Card className="glass-card">
-          <CardHeader>
-            <CardTitle className="text-sm font-medium flex items-center gap-2"><Receipt className="h-4 w-4" /> Tax Configuration</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label className="text-xs">GST Rate (%)</Label>
-                <Input
-                  value={settings.gst_rate || "18"}
-                  onChange={(e) => updateSetting("gst_rate", e.target.value)}
-                  className="h-9 text-sm mt-1"
-                />
-              </div>
-              <div>
-                <Label className="text-xs">GSTIN</Label>
-                <Input
-                  value={settings.gstin || ""}
-                  onChange={(e) => updateSetting("gstin", e.target.value)}
-                  className="h-9 text-sm mt-1"
-                />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="glass-card">
-          <CardHeader>
-            <CardTitle className="text-sm font-medium flex items-center gap-2"><Tag className="h-4 w-4" /> Service Categories</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {["AC Repair", "Washing Machine", "Refrigerator", "Installation", "Plumbing", "Electrical"].map((cat) => (
-              <div key={cat} className="flex items-center justify-between py-1.5">
-                <span className="text-sm">{cat}</span>
-                <Switch defaultChecked />
-              </div>
+        {/* Mobile Tab Selector */}
+        <div className="lg:hidden w-full">
+          <div className="flex gap-2 overflow-x-auto pb-4 mb-4 scrollbar-hide">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={cn(
+                  "flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs whitespace-nowrap transition-colors shrink-0",
+                  activeTab === tab.id
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-muted/50 text-muted-foreground hover:bg-muted"
+                )}
+              >
+                <tab.icon className="h-3 w-3" />
+                {tab.label}
+              </button>
             ))}
-          </CardContent>
-        </Card>
+          </div>
+          <div>{renderContent()}</div>
+        </div>
+
+        {/* Desktop Content */}
+        <div className="flex-1 hidden lg:block max-w-3xl">
+          {renderContent()}
+        </div>
       </div>
     </div>
   );
