@@ -43,8 +43,8 @@ export const InventoryReports = ({ items }: Props) => {
       return acc;
     }, {});
   const topUsed = Object.entries(usageCounts)
-    .map(([id, count]) => ({ name: items.find(i => i.id === id)?.name || "Unknown", count }))
-    .sort((a, b) => b.count - a.count)
+    .map(([id, count]) => ({ name: items.find(i => i.id === id)?.name || "Unknown", count: Number(count) }))
+    .sort((a, b) => Number(b.count) - Number(a.count))
     .slice(0, 6);
 
   // Stock value by status
