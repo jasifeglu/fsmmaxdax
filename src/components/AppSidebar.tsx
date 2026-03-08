@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 import { useAuth, UserRole } from "@/contexts/AuthContext";
 import {
   LayoutDashboard, Ticket, Users, Wrench, Package, DollarSign,
-  BarChart3, Settings, Calendar, ClipboardList,
+  BarChart3, Settings, Calendar, ClipboardList, Map, ShoppingBag,
   Zap, User, TrendingUp, Eye, LogOut, UserCog, Car, Trophy,
 } from "lucide-react";
 import {
@@ -24,10 +24,12 @@ const navItems: NavItem[] = [
   { title: "Dashboard", url: "/", icon: LayoutDashboard, roles: ["admin", "coordinator", "technician"] },
   { title: "Tickets", url: "/tickets", icon: Ticket, roles: ["admin", "coordinator"] },
   { title: "Schedule", url: "/schedule", icon: Calendar, roles: ["admin", "coordinator"] },
+  { title: "Route Map", url: "/route-map", icon: Map, roles: ["admin", "coordinator", "technician"] },
   { title: "Customers", url: "/customers", icon: Users, roles: ["admin", "coordinator"] },
   { title: "Technicians", url: "/technicians", icon: Wrench, roles: ["admin", "coordinator"] },
   { title: "My Jobs", url: "/my-jobs", icon: ClipboardList, roles: ["technician"] },
   { title: "Inventory", url: "/inventory", icon: Package, roles: ["admin"] },
+  { title: "Product Catalog", url: "/product-catalog", icon: ShoppingBag, roles: ["admin"] },
   { title: "Billing", url: "/billing", icon: DollarSign, roles: ["admin", "technician"] },
   { title: "Travel Expenses", url: "/travel-expenses", icon: Car, roles: ["admin", "technician"] },
   { title: "Incentives", url: "/incentives", icon: Trophy, roles: ["admin", "technician"] },

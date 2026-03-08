@@ -77,6 +77,42 @@ export type Database = {
         }
         Relationships: []
       }
+      distance_charge_rules: {
+        Row: {
+          base_fee: number
+          created_at: string
+          id: string
+          is_active: boolean
+          max_km: number
+          min_km: number
+          name: string
+          per_km_rate: number
+          updated_at: string
+        }
+        Insert: {
+          base_fee?: number
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          max_km?: number
+          min_km?: number
+          name: string
+          per_km_rate?: number
+          updated_at?: string
+        }
+        Update: {
+          base_fee?: number
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          max_km?: number
+          min_km?: number
+          name?: string
+          per_km_rate?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       incentive_rules: {
         Row: {
           created_at: string
@@ -413,6 +449,54 @@ export type Database = {
         }
         Relationships: []
       }
+      product_catalog: {
+        Row: {
+          brand: string
+          category: string
+          created_at: string
+          description: string | null
+          hsn_sac_code: string | null
+          id: string
+          is_active: boolean
+          model: string
+          name: string
+          service_price: number
+          spare_parts: string | null
+          updated_at: string
+          warranty_months: number
+        }
+        Insert: {
+          brand?: string
+          category?: string
+          created_at?: string
+          description?: string | null
+          hsn_sac_code?: string | null
+          id?: string
+          is_active?: boolean
+          model?: string
+          name: string
+          service_price?: number
+          spare_parts?: string | null
+          updated_at?: string
+          warranty_months?: number
+        }
+        Update: {
+          brand?: string
+          category?: string
+          created_at?: string
+          description?: string | null
+          hsn_sac_code?: string | null
+          id?: string
+          is_active?: boolean
+          model?: string
+          name?: string
+          service_price?: number
+          spare_parts?: string | null
+          updated_at?: string
+          warranty_months?: number
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -603,6 +687,45 @@ export type Database = {
         }
         Relationships: []
       }
+      technician_skills: {
+        Row: {
+          created_at: string
+          home_address: string | null
+          home_latitude: number | null
+          home_longitude: number | null
+          id: string
+          max_daily_jobs: number
+          proficiency_level: string
+          skill_category: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          home_address?: string | null
+          home_latitude?: number | null
+          home_longitude?: number | null
+          id?: string
+          max_daily_jobs?: number
+          proficiency_level?: string
+          skill_category?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          home_address?: string | null
+          home_latitude?: number | null
+          home_longitude?: number | null
+          id?: string
+          max_daily_jobs?: number
+          proficiency_level?: string
+          skill_category?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       tickets: {
         Row: {
           assigned_to: string | null
@@ -611,14 +734,21 @@ export type Database = {
           completed_at: string | null
           created_at: string
           created_by: string | null
+          customer_address: string | null
           customer_id: string | null
+          customer_latitude: number | null
+          customer_longitude: number | null
           customer_name: string
           customer_phone: string
+          distance_charge: number | null
+          distance_km: number | null
           id: string
           issue: string
           notes: string | null
           priority: string
+          product_id: string | null
           scheduled_at: string | null
+          service_charge: number | null
           sla_hours: number | null
           status: string
           ticket_number: string
@@ -631,14 +761,21 @@ export type Database = {
           completed_at?: string | null
           created_at?: string
           created_by?: string | null
+          customer_address?: string | null
           customer_id?: string | null
+          customer_latitude?: number | null
+          customer_longitude?: number | null
           customer_name?: string
           customer_phone?: string
+          distance_charge?: number | null
+          distance_km?: number | null
           id?: string
           issue: string
           notes?: string | null
           priority?: string
+          product_id?: string | null
           scheduled_at?: string | null
+          service_charge?: number | null
           sla_hours?: number | null
           status?: string
           ticket_number: string
@@ -651,14 +788,21 @@ export type Database = {
           completed_at?: string | null
           created_at?: string
           created_by?: string | null
+          customer_address?: string | null
           customer_id?: string | null
+          customer_latitude?: number | null
+          customer_longitude?: number | null
           customer_name?: string
           customer_phone?: string
+          distance_charge?: number | null
+          distance_km?: number | null
           id?: string
           issue?: string
           notes?: string | null
           priority?: string
+          product_id?: string | null
           scheduled_at?: string | null
+          service_charge?: number | null
           sla_hours?: number | null
           status?: string
           ticket_number?: string
@@ -670,6 +814,13 @@ export type Database = {
             columns: ["customer_id"]
             isOneToOne: false
             referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tickets_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "product_catalog"
             referencedColumns: ["id"]
           },
         ]
