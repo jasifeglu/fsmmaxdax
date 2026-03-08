@@ -302,7 +302,7 @@ export const InvoiceForm = ({ onCreated }: Props) => {
                     )}
                   </div>
                   <div className="text-right text-xs text-muted-foreground">
-                    Taxable: ₹{calcLine(item).taxable.toLocaleString()} | Tax: ₹{calcLine(item).tax.toLocaleString()} | <span className="font-semibold text-foreground">Total: ₹{calcLine(item).total.toLocaleString()}</span>
+                    Taxable: {formatINR(calcLine(item).taxable)} | Tax: {formatINR(calcLine(item).tax)} | <span className="font-semibold text-foreground">Total: {formatINR(calcLine(item).total)}</span>
                   </div>
                 </div>
               ))}
