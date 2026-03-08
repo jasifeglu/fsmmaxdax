@@ -134,7 +134,7 @@ const TravelExpensesPage = () => {
             <Car className="h-8 w-8 text-primary" />
             <div>
               <p className="text-xs text-muted-foreground">Total Expenses</p>
-              <p className="text-2xl font-bold">₹{totalAmount.toLocaleString()}</p>
+              <p className="text-2xl font-bold">{formatINR(totalAmount)}</p>
             </div>
           </div>
         </Card>
