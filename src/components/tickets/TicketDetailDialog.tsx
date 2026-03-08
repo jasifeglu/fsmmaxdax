@@ -127,6 +127,11 @@ export const TicketDetailDialog = ({ ticket, onClose, onRefresh }: TicketDetailD
             </>
           )}
 
+          {/* Comments & Discussion */}
+          <TicketComments ticketId={ticket.id} staffList={staffList} />
+
+          <Separator />
+
           {/* Timeline */}
           <TicketTimeline ticketId={ticket.id} />
 
