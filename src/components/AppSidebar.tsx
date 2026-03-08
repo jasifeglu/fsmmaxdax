@@ -3,17 +3,15 @@ import { cn } from "@/lib/utils";
 import { useAuth, UserRole } from "@/contexts/AuthContext";
 import {
   LayoutDashboard, Ticket, Users, Wrench, Package, DollarSign,
-  BarChart3, Settings, Calendar, MapPin, ClipboardList, UserCog,
-  ChevronDown, Zap, User, TrendingUp, Eye,
+  BarChart3, Settings, Calendar, ClipboardList,
+  Zap, User, TrendingUp, Eye, LogOut, UserCog,
 } from "lucide-react";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent,
   SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem,
   SidebarHeader, SidebarFooter, useSidebar,
 } from "@/components/ui/sidebar";
-import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 
 interface NavItem {
   title: string;
@@ -43,7 +41,7 @@ export function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const location = useLocation();
-  const { role, setRole } = useAuth();
+  const { role, userName, signOut } = useAuth();
 
   const filteredItems = navItems.filter((item) => item.roles.includes(role));
 
@@ -98,16 +96,20 @@ export function AppSidebar() {
 
       <SidebarFooter className="sidebar-gradient border-t border-sidebar-border p-3">
         {!collapsed && (
-          <Select value={role} onValueChange={(v) => setRole(v as UserRole)}>
-            <SelectTrigger className="bg-sidebar-accent border-sidebar-border text-sidebar-accent-foreground text-xs h-9">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="admin">👑 Admin</SelectItem>
-              <SelectItem value="coordinator">🧑‍💼 Coordinator</SelectItem>
-              <SelectItem value="technician">🔧 Technician</SelectItem>
-            </SelectContent>
-          </Select>
+          <div className="space-y-2">
+            <div className="text-xs text-sidebar-muted truncate px-1">
+              {userName}
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="w-full justify-start text-sidebar-foreground hover:text-sidebar-accent-foreground hover:bg-sidebar-accent/50 text-xs"
+              onClick={signOut}
+            >
+              <LogOut className="h-3.5 w-3.5 mr-2" />
+              Sign Out
+            </Button>
+          </div>
         )}
       </SidebarFooter>
     </Sidebar>
