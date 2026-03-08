@@ -77,6 +77,48 @@ export type Database = {
         }
         Relationships: []
       }
+      incentive_rules: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          metric: string
+          name: string
+          reward_unit: string
+          reward_value: number
+          target_value: number
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          metric?: string
+          name: string
+          reward_unit?: string
+          reward_value?: number
+          target_value?: number
+          type?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          metric?: string
+          name?: string
+          reward_unit?: string
+          reward_value?: number
+          target_value?: number
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       inventory: {
         Row: {
           category: string
@@ -225,6 +267,75 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      technician_incentives: {
+        Row: {
+          approved_by: string | null
+          attendance_bonus: number
+          avg_completion_hours: number
+          avg_rating: number
+          completed_tickets: number
+          created_at: string
+          first_fix_rate: number
+          id: string
+          month: string
+          on_time_rate: number
+          performance_bonus: number
+          performance_score: number
+          quality_bonus: number
+          revenue_commission: number
+          revenue_generated: number
+          speed_bonus: number
+          status: string
+          total_incentive: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          approved_by?: string | null
+          attendance_bonus?: number
+          avg_completion_hours?: number
+          avg_rating?: number
+          completed_tickets?: number
+          created_at?: string
+          first_fix_rate?: number
+          id?: string
+          month: string
+          on_time_rate?: number
+          performance_bonus?: number
+          performance_score?: number
+          quality_bonus?: number
+          revenue_commission?: number
+          revenue_generated?: number
+          speed_bonus?: number
+          status?: string
+          total_incentive?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          approved_by?: string | null
+          attendance_bonus?: number
+          avg_completion_hours?: number
+          avg_rating?: number
+          completed_tickets?: number
+          created_at?: string
+          first_fix_rate?: number
+          id?: string
+          month?: string
+          on_time_rate?: number
+          performance_bonus?: number
+          performance_score?: number
+          quality_bonus?: number
+          revenue_commission?: number
+          revenue_generated?: number
+          speed_bonus?: number
+          status?: string
+          total_incentive?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       tickets: {
         Row: {
