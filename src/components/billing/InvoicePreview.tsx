@@ -2,6 +2,7 @@ import { useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Download, Share2 } from "lucide-react";
+import { formatINR } from "@/lib/formatINR";
 
 interface Props {
   invoice: any;
