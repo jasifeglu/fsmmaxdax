@@ -74,6 +74,7 @@ const ProtectedRoutes = () => {
         <Route path="/performance" element={<PerformancePage />} />
         <Route path="/user-monitoring" element={<RoleGuard allowed={["admin", "coordinator"]}><UserMonitoringPage /></RoleGuard>} />
         <Route path="/users" element={<RoleGuard allowed={["admin"]}><UsersPage /></RoleGuard>} />
+        <Route path="/audit-logs" element={<RoleGuard allowed={["admin"]}><AuditLogsPage /></RoleGuard>} />
         <Route path="/settings" element={<RoleGuard allowed={["admin"]}><SettingsPage /></RoleGuard>} />
         <Route path="*" element={<NotFound />} />
       </Routes>

@@ -38,6 +38,7 @@ const navItems: NavItem[] = [
   { title: "My Performance", url: "/performance", icon: TrendingUp, roles: ["admin", "coordinator", "technician"] },
   { title: "User Monitoring", url: "/user-monitoring", icon: Eye, roles: ["admin", "coordinator"] },
   { title: "User Management", url: "/users", icon: UserCog, roles: ["admin"] },
+  { title: "Audit Logs", url: "/audit-logs", icon: ScrollText, roles: ["admin"] },
   { title: "Settings", url: "/settings", icon: Settings, roles: ["admin"] },
 ];
 
