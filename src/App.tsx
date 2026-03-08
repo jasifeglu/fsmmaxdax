@@ -56,6 +56,8 @@ const ProtectedRoutes = () => {
         <Route path="/" element={<Index />} />
         <Route path="/tickets" element={<RoleGuard allowed={["admin", "coordinator"]}><TicketsPage /></RoleGuard>} />
         <Route path="/schedule" element={<RoleGuard allowed={["admin", "coordinator"]}><SchedulePage /></RoleGuard>} />
+        <Route path="/route-map" element={<RoleGuard allowed={["admin", "coordinator", "technician"]}><RouteMapPage /></RoleGuard>} />
+        <Route path="/product-catalog" element={<RoleGuard allowed={["admin"]}><ProductCatalogPage /></RoleGuard>} />
         <Route path="/customers" element={<RoleGuard allowed={["admin", "coordinator"]}><CustomersPage /></RoleGuard>} />
         <Route path="/technicians" element={<RoleGuard allowed={["admin", "coordinator"]}><TechniciansPage /></RoleGuard>} />
         <Route path="/my-jobs" element={<RoleGuard allowed={["technician"]}><Index /></RoleGuard>} />
