@@ -1,11 +1,12 @@
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { useAuth } from "@/contexts/AuthContext";
-import { Search } from "lucide-react";
+import { Search, FlaskConical } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { ProfileDropdown } from "@/components/ProfileDropdown";
 import { NotificationsDropdown } from "@/components/NotificationsDropdown";
+import { supabase } from "@/integrations/supabase/client";
 
 const roleTitles = {
   admin: "Admin Panel",
