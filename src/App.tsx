@@ -22,8 +22,15 @@ import PerformancePage from "./pages/PerformancePage";
 import UserMonitoringPage from "./pages/UserMonitoringPage";
 import TravelExpensesPage from "./pages/TravelExpensesPage";
 import { Loader2 } from "lucide-react";
+import type { UserRole } from "@/contexts/AuthContext";
 
 const queryClient = new QueryClient();
+
+const RoleGuard = ({ allowed, children }: { allowed: UserRole[]; children: React.ReactNode }) => {
+  const { role } = useAuth();
+  if (!allowed.includes(role)) return <Navigate to="/" replace />;
+  return <>{children}</>;
+};
 
 const ProtectedRoutes = () => {
   const { user, loading } = useAuth();
@@ -44,20 +51,20 @@ const ProtectedRoutes = () => {
     <AppLayout>
       <Routes>
         <Route path="/" element={<Index />} />
-        <Route path="/tickets" element={<TicketsPage />} />
-        <Route path="/schedule" element={<SchedulePage />} />
-        <Route path="/customers" element={<CustomersPage />} />
-        <Route path="/technicians" element={<TechniciansPage />} />
-        <Route path="/my-jobs" element={<Index />} />
-        <Route path="/inventory" element={<InventoryPage />} />
-        <Route path="/billing" element={<BillingPage />} />
-        <Route path="/reports" element={<ReportsPage />} />
-        <Route path="/users" element={<UsersPage />} />
+        <Route path="/tickets" element={<RoleGuard allowed={["admin", "coordinator"]}><TicketsPage /></RoleGuard>} />
+        <Route path="/schedule" element={<RoleGuard allowed={["admin", "coordinator"]}><SchedulePage /></RoleGuard>} />
+        <Route path="/customers" element={<RoleGuard allowed={["admin", "coordinator"]}><CustomersPage /></RoleGuard>} />
+        <Route path="/technicians" element={<RoleGuard allowed={["admin", "coordinator"]}><TechniciansPage /></RoleGuard>} />
+        <Route path="/my-jobs" element={<RoleGuard allowed={["technician"]}><Index /></RoleGuard>} />
+        <Route path="/inventory" element={<RoleGuard allowed={["admin"]}><InventoryPage /></RoleGuard>} />
+        <Route path="/billing" element={<RoleGuard allowed={["admin", "technician"]}><BillingPage /></RoleGuard>} />
+        <Route path="/travel-expenses" element={<RoleGuard allowed={["admin", "technician"]}><TravelExpensesPage /></RoleGuard>} />
+        <Route path="/reports" element={<RoleGuard allowed={["admin"]}><ReportsPage /></RoleGuard>} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/performance" element={<PerformancePage />} />
-        <Route path="/user-monitoring" element={<UserMonitoringPage />} />
-        <Route path="/travel-expenses" element={<TravelExpensesPage />} />
-        <Route path="/settings" element={<SettingsPage />} />
+        <Route path="/user-monitoring" element={<RoleGuard allowed={["admin", "coordinator"]}><UserMonitoringPage /></RoleGuard>} />
+        <Route path="/users" element={<RoleGuard allowed={["admin"]}><UsersPage /></RoleGuard>} />
+        <Route path="/settings" element={<RoleGuard allowed={["admin"]}><SettingsPage /></RoleGuard>} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </AppLayout>
