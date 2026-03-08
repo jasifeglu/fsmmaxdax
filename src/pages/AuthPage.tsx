@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Zap, Loader2, Mail, Lock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Link } from "react-router-dom";
 
 const AuthPage = () => {
   const { toast } = useToast();
@@ -22,9 +23,6 @@ const AuthPage = () => {
       toast({ title: "Login failed", description: error.message, variant: "destructive" });
     }
   };
-
-
-
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
@@ -62,7 +60,12 @@ const AuthPage = () => {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password">Password</Label>
+                  <Link to="/forgot-password" className="text-xs text-primary hover:underline">
+                    Forgot Password?
+                  </Link>
+                </div>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input

@@ -27,6 +27,8 @@ import TravelExpensesPage from "./pages/TravelExpensesPage";
 import IncentivesPage from "./pages/IncentivesPage";
 import { Loader2 } from "lucide-react";
 import type { UserRole } from "@/contexts/AuthContext";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 
 const queryClient = new QueryClient();
 
@@ -100,6 +102,8 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/auth" element={<PublicRoute><AuthPage /></PublicRoute>} />
+            <Route path="/forgot-password" element={<PublicRoute><ForgotPasswordPage /></PublicRoute>} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/install" element={<InstallPage />} />
             <Route path="/*" element={<ProtectedRoutes />} />
           </Routes>
