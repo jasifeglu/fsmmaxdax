@@ -11,6 +11,7 @@ import { CommunicationSettings } from "@/components/settings/CommunicationSettin
 import { InventorySettings, BillingSettings, KPISettings } from "@/components/settings/OperationalSettings";
 import { SecuritySettings } from "@/components/settings/SecuritySettings";
 import { IntegrationSettings, AppearanceSettings, DataSettings } from "@/components/settings/SystemSettings";
+import { MockDataSettings } from "@/components/settings/MockDataSettings";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
