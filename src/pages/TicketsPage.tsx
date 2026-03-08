@@ -1,40 +1,152 @@
+import { useState, useEffect } from "react";
 import { PageHeader } from "@/components/PageHeader";
 import { StatusBadge } from "@/components/StatusBadge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Plus, Filter } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Search, Plus, Filter, Loader2 } from "lucide-react";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { useState } from "react";
-
-const allTickets = [
-  { id: "TKT-1042", customer: "Rajesh Kumar", phone: "+91 98765 43210", issue: "AC not cooling properly", category: "AC Repair", status: "New", priority: "High", assignee: "Unassigned", created: "10 min ago", sla: "4 hrs" },
-  { id: "TKT-1041", customer: "Priya Sharma", phone: "+91 87654 32109", issue: "Washing machine not draining", category: "Appliance Repair", status: "On-Site", priority: "Medium", assignee: "Amit P.", created: "2 hrs ago", sla: "6 hrs" },
-  { id: "TKT-1040", customer: "Mohammed Ali", phone: "+91 76543 21098", issue: "Refrigerator gas leak", category: "Refrigerator", status: "Completed", priority: "Critical", assignee: "Suresh K.", created: "5 hrs ago", sla: "2 hrs" },
-  { id: "TKT-1039", customer: "Anita Desai", phone: "+91 65432 10987", issue: "Water purifier installation", category: "Installation", status: "Scheduled", priority: "Low", assignee: "Vikram S.", created: "1 day ago", sla: "24 hrs" },
-  { id: "TKT-1038", customer: "Sanjay Patel", phone: "+91 54321 09876", issue: "Microwave not heating", category: "Appliance Repair", status: "Work-In-Progress", priority: "Medium", assignee: "Amit P.", created: "1 day ago", sla: "8 hrs" },
-  { id: "TKT-1037", customer: "Kavita Joshi", phone: "+91 43210 98765", issue: "Chimney servicing", category: "Maintenance", status: "Assigned", priority: "Low", assignee: "Ravi M.", created: "2 days ago", sla: "48 hrs" },
-  { id: "TKT-1036", customer: "Deepak Verma", phone: "+91 32109 87654", issue: "Geyser leaking from top", category: "Plumbing", status: "Closed", priority: "High", assignee: "Deepak R.", created: "3 days ago", sla: "4 hrs" },
-];
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription,
+} from "@/components/ui/dialog";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 const TicketsPage = () => {
+  const { toast } = useToast();
+  const { user } = useAuth();
+  const [tickets, setTickets] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [creating, setCreating] = useState(false);
 
-  const filtered = allTickets.filter((t) => {
-    const matchSearch = t.customer.toLowerCase().includes(search.toLowerCase()) || t.id.toLowerCase().includes(search.toLowerCase());
-    const matchStatus = statusFilter === "all" || t.status.toLowerCase().replace(/\s+/g, "-") === statusFilter;
+  // New ticket form
+  const [form, setForm] = useState({
+    customer_name: "", customer_phone: "", issue: "",
+    category: "General", priority: "Medium",
+  });
+
+  const fetchTickets = async () => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from("tickets")
+      .select("*")
+      .order("created_at", { ascending: false });
+    if (!error) setTickets(data || []);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchTickets();
+    // Realtime subscription
+    const channel = supabase
+      .channel("tickets-changes")
+      .on("postgres_changes", { event: "*", schema: "public", table: "tickets" }, () => fetchTickets())
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, []);
+
+  const generateTicketNumber = () => {
+    const num = Math.floor(100000 + Math.random() * 900000);
+    return `MXD-${num}`;
+  };
+
+  const handleCreate = async () => {
+    if (!form.customer_name || !form.issue) return;
+    setCreating(true);
+    const { error } = await supabase.from("tickets").insert({
+      ticket_number: generateTicketNumber(),
+      customer_name: form.customer_name,
+      customer_phone: form.customer_phone,
+      issue: form.issue,
+      category: form.category,
+      priority: form.priority,
+      status: "New",
+      created_by: user?.id,
+    });
+    setCreating(false);
+    if (error) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Ticket created" });
+      setDialogOpen(false);
+      setForm({ customer_name: "", customer_phone: "", issue: "", category: "General", priority: "Medium" });
+    }
+  };
+
+  const filtered = tickets.filter((t) => {
+    const matchSearch = (t.customer_name || "").toLowerCase().includes(search.toLowerCase()) ||
+      (t.ticket_number || "").toLowerCase().includes(search.toLowerCase());
+    const matchStatus = statusFilter === "all" || t.status?.toLowerCase() === statusFilter;
     return matchSearch && matchStatus;
   });
 
   return (
     <div>
       <PageHeader title="Service Tickets" description="Manage all service requests">
-        <Button size="sm" className="bg-primary text-primary-foreground gap-1.5">
-          <Plus className="h-3.5 w-3.5" /> New Ticket
-        </Button>
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+          <DialogTrigger asChild>
+            <Button size="sm" className="bg-primary text-primary-foreground gap-1.5">
+              <Plus className="h-3.5 w-3.5" /> New Ticket
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Create New Ticket</DialogTitle>
+              <DialogDescription>Add a new service request</DialogDescription>
+            </DialogHeader>
+            <div className="space-y-3">
+              <div>
+                <Label className="text-xs">Customer Name</Label>
+                <Input value={form.customer_name} onChange={(e) => setForm({ ...form, customer_name: e.target.value })} className="mt-1" />
+              </div>
+              <div>
+                <Label className="text-xs">Phone</Label>
+                <Input value={form.customer_phone} onChange={(e) => setForm({ ...form, customer_phone: e.target.value })} className="mt-1" />
+              </div>
+              <div>
+                <Label className="text-xs">Issue</Label>
+                <Textarea value={form.issue} onChange={(e) => setForm({ ...form, issue: e.target.value })} className="mt-1" rows={2} />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label className="text-xs">Category</Label>
+                  <Select value={form.category} onValueChange={(v) => setForm({ ...form, category: v })}>
+                    <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {["General", "AC Repair", "Washing Machine", "Refrigerator", "Installation", "Plumbing", "Electrical", "Maintenance"].map(c => (
+                        <SelectItem key={c} value={c}>{c}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label className="text-xs">Priority</Label>
+                  <Select value={form.priority} onValueChange={(v) => setForm({ ...form, priority: v })}>
+                    <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Low">Low</SelectItem>
+                      <SelectItem value="Medium">Medium</SelectItem>
+                      <SelectItem value="High">High</SelectItem>
+                      <SelectItem value="Critical">Critical</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <Button onClick={handleCreate} disabled={creating} className="w-full">
+                {creating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Create Ticket
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </PageHeader>
 
       <Card className="glass-card">
@@ -63,43 +175,43 @@ const TicketsPage = () => {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="text-muted-foreground text-xs border-b">
-                  <th className="text-left py-2 font-medium">Ticket</th>
-                  <th className="text-left py-2 font-medium">Customer</th>
-                  <th className="text-left py-2 font-medium hidden md:table-cell">Issue</th>
-                  <th className="text-left py-2 font-medium">Status</th>
-                  <th className="text-left py-2 font-medium hidden sm:table-cell">Priority</th>
-                  <th className="text-left py-2 font-medium hidden lg:table-cell">Assignee</th>
-                  <th className="text-left py-2 font-medium hidden lg:table-cell">SLA</th>
-                  <th className="text-left py-2 font-medium">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map((t) => (
-                  <tr key={t.id} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
-                    <td className="py-2.5 font-mono text-xs text-primary">{t.id}</td>
-                    <td className="py-2.5">
-                      <div>
-                        <span className="font-medium">{t.customer}</span>
-                        <span className="block text-xs text-muted-foreground">{t.phone}</span>
-                      </div>
-                    </td>
-                    <td className="py-2.5 text-muted-foreground hidden md:table-cell max-w-48 truncate">{t.issue}</td>
-                    <td className="py-2.5"><StatusBadge status={t.status} /></td>
-                    <td className="py-2.5 hidden sm:table-cell"><StatusBadge status={t.priority} /></td>
-                    <td className="py-2.5 text-muted-foreground hidden lg:table-cell">{t.assignee}</td>
-                    <td className="py-2.5 text-xs text-muted-foreground hidden lg:table-cell">{t.sla}</td>
-                    <td className="py-2.5">
-                      <Button variant="ghost" size="sm" className="text-xs h-7">View</Button>
-                    </td>
+          {loading ? (
+            <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
+          ) : filtered.length === 0 ? (
+            <p className="text-center text-sm text-muted-foreground py-8">No tickets found. Create your first ticket!</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="text-muted-foreground text-xs border-b">
+                    <th className="text-left py-2 font-medium">Ticket</th>
+                    <th className="text-left py-2 font-medium">Customer</th>
+                    <th className="text-left py-2 font-medium hidden md:table-cell">Issue</th>
+                    <th className="text-left py-2 font-medium">Status</th>
+                    <th className="text-left py-2 font-medium hidden sm:table-cell">Priority</th>
+                    <th className="text-left py-2 font-medium hidden lg:table-cell">Assignee</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {filtered.map((t) => (
+                    <tr key={t.id} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
+                      <td className="py-2.5 font-mono text-xs text-primary">{t.ticket_number}</td>
+                      <td className="py-2.5">
+                        <div>
+                          <span className="font-medium">{t.customer_name}</span>
+                          {t.customer_phone && <span className="block text-xs text-muted-foreground">{t.customer_phone}</span>}
+                        </div>
+                      </td>
+                      <td className="py-2.5 text-muted-foreground hidden md:table-cell max-w-48 truncate">{t.issue}</td>
+                      <td className="py-2.5"><StatusBadge status={t.status} /></td>
+                      <td className="py-2.5 hidden sm:table-cell"><StatusBadge status={t.priority} /></td>
+                      <td className="py-2.5 text-muted-foreground hidden lg:table-cell">{t.assignee_name || "Unassigned"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

@@ -14,6 +14,111 @@ export type Database = {
   }
   public: {
     Tables: {
+      app_settings: {
+        Row: {
+          description: string | null
+          id: string
+          key: string
+          updated_at: string
+          updated_by: string | null
+          value: string
+        }
+        Insert: {
+          description?: string | null
+          id?: string
+          key: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: string
+        }
+        Update: {
+          description?: string | null
+          id?: string
+          key?: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: string
+        }
+        Relationships: []
+      }
+      customers: {
+        Row: {
+          address: string | null
+          created_at: string
+          email: string | null
+          id: string
+          name: string
+          notes: string | null
+          phone: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          name: string
+          notes?: string | null
+          phone: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string
+          notes?: string | null
+          phone?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      inventory: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          min_stock: number
+          name: string
+          price: number
+          sku: string
+          status: string
+          updated_at: string
+          van_stock: number
+          warehouse_stock: number
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          id?: string
+          min_stock?: number
+          name: string
+          price?: number
+          sku: string
+          status?: string
+          updated_at?: string
+          van_stock?: number
+          warehouse_stock?: number
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          min_stock?: number
+          name?: string
+          price?: number
+          sku?: string
+          status?: string
+          updated_at?: string
+          van_stock?: number
+          warehouse_stock?: number
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -40,6 +145,177 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      selfie_checkins: {
+        Row: {
+          address: string | null
+          checkin_type: string
+          created_at: string
+          id: string
+          latitude: number | null
+          longitude: number | null
+          notes: string | null
+          selfie_url: string | null
+          ticket_id: string | null
+          user_id: string
+        }
+        Insert: {
+          address?: string | null
+          checkin_type?: string
+          created_at?: string
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          notes?: string | null
+          selfie_url?: string | null
+          ticket_id?: string | null
+          user_id: string
+        }
+        Update: {
+          address?: string | null
+          checkin_type?: string
+          created_at?: string
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          notes?: string | null
+          selfie_url?: string | null
+          ticket_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "selfie_checkins_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tickets: {
+        Row: {
+          assigned_to: string | null
+          assignee_name: string | null
+          category: string
+          completed_at: string | null
+          created_at: string
+          created_by: string | null
+          customer_id: string | null
+          customer_name: string
+          customer_phone: string
+          id: string
+          issue: string
+          notes: string | null
+          priority: string
+          scheduled_at: string | null
+          sla_hours: number | null
+          status: string
+          ticket_number: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          assignee_name?: string | null
+          category?: string
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string | null
+          customer_name?: string
+          customer_phone?: string
+          id?: string
+          issue: string
+          notes?: string | null
+          priority?: string
+          scheduled_at?: string | null
+          sla_hours?: number | null
+          status?: string
+          ticket_number: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_to?: string | null
+          assignee_name?: string | null
+          category?: string
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string | null
+          customer_name?: string
+          customer_phone?: string
+          id?: string
+          issue?: string
+          notes?: string | null
+          priority?: string
+          scheduled_at?: string | null
+          sla_hours?: number | null
+          status?: string
+          ticket_number?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tickets_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      travel_expenses: {
+        Row: {
+          amount: number
+          approved_by: string | null
+          created_at: string
+          description: string | null
+          distance_km: number | null
+          expense_date: string
+          expense_type: string
+          id: string
+          receipt_url: string | null
+          status: string
+          ticket_id: string | null
+          user_id: string
+        }
+        Insert: {
+          amount?: number
+          approved_by?: string | null
+          created_at?: string
+          description?: string | null
+          distance_km?: number | null
+          expense_date?: string
+          expense_type?: string
+          id?: string
+          receipt_url?: string | null
+          status?: string
+          ticket_id?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          approved_by?: string | null
+          created_at?: string
+          description?: string | null
+          distance_km?: number | null
+          expense_date?: string
+          expense_type?: string
+          id?: string
+          receipt_url?: string | null
+          status?: string
+          ticket_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "travel_expenses_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "tickets"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {

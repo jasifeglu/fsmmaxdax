@@ -20,6 +20,7 @@ import SettingsPage from "./pages/SettingsPage";
 import ProfilePage from "./pages/ProfilePage";
 import PerformancePage from "./pages/PerformancePage";
 import UserMonitoringPage from "./pages/UserMonitoringPage";
+import TravelExpensesPage from "./pages/TravelExpensesPage";
 import { Loader2 } from "lucide-react";
 
 const queryClient = new QueryClient();
@@ -55,6 +56,7 @@ const ProtectedRoutes = () => {
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/performance" element={<PerformancePage />} />
         <Route path="/user-monitoring" element={<UserMonitoringPage />} />
+        <Route path="/travel-expenses" element={<TravelExpensesPage />} />
         <Route path="/settings" element={<SettingsPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
