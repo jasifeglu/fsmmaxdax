@@ -14,6 +14,7 @@ import { IntegrationSettings, AppearanceSettings, DataSettings } from "@/compone
 import { MockDataSettings } from "@/components/settings/MockDataSettings";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { FlaskConical } from "lucide-react";
 
 const tabs = [
   { id: "general", label: "General", icon: Building2 },
