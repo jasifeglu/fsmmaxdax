@@ -2,9 +2,10 @@ import { ReactNode } from "react";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { useAuth } from "@/contexts/AuthContext";
-import { Bell, Search } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { ProfileDropdown } from "@/components/ProfileDropdown";
+import { NotificationsDropdown } from "@/components/NotificationsDropdown";
 
 const roleTitles = {
   admin: "Admin Panel",
@@ -13,7 +14,7 @@ const roleTitles = {
 };
 
 export const AppLayout = ({ children }: { children: ReactNode }) => {
-  const { role, userName } = useAuth();
+  const { role } = useAuth();
 
   return (
     <SidebarProvider>
@@ -35,13 +36,8 @@ export const AppLayout = ({ children }: { children: ReactNode }) => {
                   className="h-8 w-52 pl-8 text-xs bg-muted/50 border-none"
                 />
               </div>
-              <Button variant="ghost" size="icon" className="relative h-8 w-8">
-                <Bell className="h-4 w-4 text-muted-foreground" />
-                <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-destructive animate-pulse-dot" />
-              </Button>
-              <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-xs font-semibold text-primary-foreground">
-                {userName.charAt(0)}
-              </div>
+              <NotificationsDropdown />
+              <ProfileDropdown />
             </div>
           </header>
           <main className="flex-1 p-4 md:p-6 overflow-auto">
