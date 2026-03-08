@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -8,8 +9,10 @@ import { DeviceSection } from "@/components/tickets/DeviceSection";
 import { VendorSection } from "@/components/tickets/VendorSection";
 import { TicketTimeline } from "@/components/tickets/TicketTimeline";
 import { MultiTechnicianSection } from "@/components/tickets/MultiTechnicianSection";
+import { TicketComments } from "@/components/tickets/TicketComments";
 import { formatINR } from "@/lib/formatINR";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 
 interface TicketDetailDialogProps {
   ticket: any | null;
@@ -19,6 +22,13 @@ interface TicketDetailDialogProps {
 
 export const TicketDetailDialog = ({ ticket, onClose, onRefresh }: TicketDetailDialogProps) => {
   const { role } = useAuth();
+  const [staffList, setStaffList] = useState<{ id: string; name: string }[]>([]);
+
+  useEffect(() => {
+    supabase.from("profiles").select("id, full_name").then(({ data }) => {
+      setStaffList((data || []).map((p: any) => ({ id: p.id, name: p.full_name })));
+    });
+  }, []);
 
   if (!ticket) return null;
 
@@ -116,6 +126,11 @@ export const TicketDetailDialog = ({ ticket, onClose, onRefresh }: TicketDetailD
               <Separator />
             </>
           )}
+
+          {/* Comments & Discussion */}
+          <TicketComments ticketId={ticket.id} staffList={staffList} />
+
+          <Separator />
 
           {/* Timeline */}
           <TicketTimeline ticketId={ticket.id} />
