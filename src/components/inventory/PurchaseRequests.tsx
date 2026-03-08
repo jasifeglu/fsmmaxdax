@@ -52,7 +52,7 @@ export const PurchaseRequests = ({ items }: Props) => {
   };
 
   const handleApproval = async (id: string, newStatus: "approved" | "rejected") => {
-    await supabase.from("purchase_requests").update({ status: newStatus, approved_by: userId, updated_at: new Date().toISOString() }).eq("id", id);
+    await supabase.from("purchase_requests").update({ status: newStatus, approved_by: user?.id, updated_at: new Date().toISOString() }).eq("id", id);
     toast({ title: `Request ${newStatus}` });
     fetchRequests();
   };
