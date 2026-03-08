@@ -27,6 +27,8 @@ import TravelExpensesPage from "./pages/TravelExpensesPage";
 import IncentivesPage from "./pages/IncentivesPage";
 import { Loader2 } from "lucide-react";
 import type { UserRole } from "@/contexts/AuthContext";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 
 const queryClient = new QueryClient();
 
