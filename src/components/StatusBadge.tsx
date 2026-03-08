@@ -10,7 +10,15 @@ const statusStyles: Record<string, string> = {
   assigned: "badge-primary",
   scheduled: "badge-primary",
   "on-site": "badge-warning",
+  "on-site-attempt": "badge-warning",
   "work-in-progress": "badge-warning",
+  "pickup-required": "badge-warning",
+  "sent-to-vendor": "badge-info",
+  "vendor-repairing": "badge-info",
+  "awaiting-return": "badge-info",
+  "returned-from-vendor": "badge-primary",
+  reinstallation: "badge-warning",
+  testing: "badge-warning",
   completed: "badge-success",
   closed: "badge-success",
   pending: "badge-warning",
@@ -23,6 +31,14 @@ const statusStyles: Record<string, string> = {
   medium: "badge-warning",
   low: "badge-info",
   critical: "badge-destructive",
+  // Delay tags
+  "vendor-delay": "badge-destructive",
+  "customer-delay": "badge-warning",
+  "technician-delay": "badge-warning",
+  "spare-parts-delay": "badge-destructive",
+  delayed: "badge-destructive",
+  "on-hold": "badge-warning",
+  escalated: "badge-destructive",
 };
 
 export const StatusBadge = ({ status, className }: StatusBadgeProps) => {
