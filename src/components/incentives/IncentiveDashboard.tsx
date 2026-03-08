@@ -5,6 +5,7 @@ import {
   Trophy, Target, Star, Zap, Clock, DollarSign, TrendingUp, Award,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { formatINR } from "@/lib/formatINR";
 
 // Mock data for current technician
 const performanceData = {
@@ -94,8 +95,8 @@ export const IncentiveDashboard = () => {
               <div className="mx-auto h-20 w-20 rounded-full bg-success/10 flex items-center justify-center">
                 <DollarSign className="h-8 w-8 text-success" />
               </div>
-              <p className="text-2xl font-bold">₹{d.earnings.totalEarnings.toLocaleString()}</p>
-              <p className="text-xs text-muted-foreground">Total Earnings (incl. ₹{d.earnings.totalIncentive.toLocaleString()} incentive)</p>
+              <p className="text-2xl font-bold">{formatINR(d.earnings.totalEarnings)}</p>
+              <p className="text-xs text-muted-foreground">Total Earnings (incl. {formatINR(d.earnings.totalIncentive)} incentive)</p>
             </CardContent>
           </Card>
         </motion.div>
@@ -136,14 +137,14 @@ export const IncentiveDashboard = () => {
               ].map((item) => (
                 <div key={item.label} className="flex items-center justify-between text-sm py-1.5 border-b border-border/30">
                   <span className="text-muted-foreground">{item.label}</span>
-                  <span className={cn("font-mono font-medium", item.highlight && item.value > 0 && "text-success")}>
-                    ₹{item.value.toLocaleString()}
+                   <span className={cn("font-mono font-medium", item.highlight && item.value > 0 && "text-success")}>
+                    {formatINR(item.value)}
                   </span>
                 </div>
               ))}
               <div className="flex items-center justify-between text-sm py-2 font-bold">
                 <span>Total Earnings</span>
-                <span className="text-primary font-mono">₹{d.earnings.totalEarnings.toLocaleString()}</span>
+                <span className="text-primary font-mono">{formatINR(d.earnings.totalEarnings)}</span>
               </div>
             </div>
           </CardContent>

@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DollarSign, TrendingUp, TrendingDown, CreditCard } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { formatINRCompact } from "@/lib/formatINR";
 
 interface Props {
   invoices: any[];
@@ -30,7 +31,7 @@ export const FinancialOverviewPanel = ({ invoices }: Props) => {
 
   const pendingCount = invoices.filter(i => i.payment_status === "Pending").length;
 
-  const fmt = (n: number) => n >= 100000 ? `₹${(n / 100000).toFixed(1)}L` : `₹${n.toLocaleString()}`;
+  const fmt = formatINRCompact;
 
   const metrics = [
     { label: "Today's Revenue", value: fmt(todayRevenue), icon: DollarSign, trend: "", positive: true },

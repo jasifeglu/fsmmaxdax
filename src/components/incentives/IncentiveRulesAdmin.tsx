@@ -8,6 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
+import { formatINR } from "@/lib/formatINR";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -105,7 +106,7 @@ export const IncentiveRulesAdmin = () => {
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium">{rule.name}</p>
                 <p className="text-xs text-muted-foreground">
-                  {typeLabels[rule.type]} · Target: {rule.target_value} ({metricLabels[rule.metric]}) → Reward: {rule.reward_unit === "percentage" ? `${rule.reward_value}%` : `₹${rule.reward_value.toLocaleString()}`}
+                  {typeLabels[rule.type]} · Target: {rule.target_value} ({metricLabels[rule.metric]}) → Reward: {rule.reward_unit === "percentage" ? `${rule.reward_value}%` : formatINR(rule.reward_value)}
                 </p>
               </div>
               <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => openEdit(rule)}>

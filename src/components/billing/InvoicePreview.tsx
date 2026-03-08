@@ -2,6 +2,7 @@ import { useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Download, Share2 } from "lucide-react";
+import { formatINR } from "@/lib/formatINR";
 
 interface Props {
   invoice: any;
@@ -52,7 +53,7 @@ export const InvoicePreview = ({ invoice, items, open, onOpenChange }: Props) =>
 
   const handleWhatsApp = () => {
     const text = encodeURIComponent(
-      `Invoice: ${invoice.invoice_number}\nCustomer: ${invoice.customer_name}\nAmount: ₹${Number(invoice.grand_total).toLocaleString()}\nDate: ${invoice.invoice_date}\nStatus: ${invoice.payment_status}`
+      `Invoice: ${invoice.invoice_number}\nCustomer: ${invoice.customer_name}\nAmount: ${formatINR(Number(invoice.grand_total))}\nDate: ${invoice.invoice_date}\nStatus: ${invoice.payment_status}`
     );
     const phone = invoice.customer_phone ? invoice.customer_phone.replace(/\D/g, '') : '';
     const url = phone ? `https://wa.me/${phone}?text=${text}` : `https://wa.me/?text=${text}`;
@@ -136,13 +137,13 @@ export const InvoicePreview = ({ invoice, items, open, onOpenChange }: Props) =>
                   <td className="border border-border p-2">{item.description}</td>
                   <td className="border border-border p-2 font-mono">{item.hsn_sac_code || "—"}</td>
                   <td className="border border-border p-2 text-right">{Number(item.quantity)}</td>
-                  <td className="border border-border p-2 text-right">{Number(item.unit_price).toLocaleString()}</td>
-                  <td className="border border-border p-2 text-right">{Number(item.taxable_value).toLocaleString()}</td>
+                  <td className="border border-border p-2 text-right">{formatINR(Number(item.unit_price), false)}</td>
+                  <td className="border border-border p-2 text-right">{formatINR(Number(item.taxable_value), false)}</td>
                   {!invoice.is_interstate && <td className="border border-border p-2 text-right">{Number(item.cgst_rate)}%</td>}
                   {!invoice.is_interstate && <td className="border border-border p-2 text-right">{Number(item.sgst_rate)}%</td>}
                   {invoice.is_interstate && <td className="border border-border p-2 text-right">{Number(item.igst_rate)}%</td>}
-                  <td className="border border-border p-2 text-right">{Number(item.tax_amount).toLocaleString()}</td>
-                  <td className="border border-border p-2 text-right font-semibold">{Number(item.total_amount).toLocaleString()}</td>
+                  <td className="border border-border p-2 text-right">{formatINR(Number(item.tax_amount), false)}</td>
+                  <td className="border border-border p-2 text-right font-semibold">{formatINR(Number(item.total_amount), false)}</td>
                 </tr>
               ))}
             </tbody>
@@ -151,12 +152,12 @@ export const InvoicePreview = ({ invoice, items, open, onOpenChange }: Props) =>
           {/* Tax Summary */}
           <div className="flex justify-end mb-4">
             <div className="w-64 space-y-1 text-xs">
-              <div className="flex justify-between"><span className="text-muted-foreground">Subtotal:</span><span className="font-mono">₹{Number(invoice.subtotal).toLocaleString()}</span></div>
-              {!invoice.is_interstate && <div className="flex justify-between"><span className="text-muted-foreground">CGST:</span><span className="font-mono">₹{Number(invoice.cgst_total).toLocaleString()}</span></div>}
-              {!invoice.is_interstate && <div className="flex justify-between"><span className="text-muted-foreground">SGST:</span><span className="font-mono">₹{Number(invoice.sgst_total).toLocaleString()}</span></div>}
-              {invoice.is_interstate && <div className="flex justify-between"><span className="text-muted-foreground">IGST:</span><span className="font-mono">₹{Number(invoice.igst_total).toLocaleString()}</span></div>}
+              <div className="flex justify-between"><span className="text-muted-foreground">Subtotal:</span><span className="font-mono">{formatINR(Number(invoice.subtotal))}</span></div>
+              {!invoice.is_interstate && <div className="flex justify-between"><span className="text-muted-foreground">CGST:</span><span className="font-mono">{formatINR(Number(invoice.cgst_total))}</span></div>}
+              {!invoice.is_interstate && <div className="flex justify-between"><span className="text-muted-foreground">SGST:</span><span className="font-mono">{formatINR(Number(invoice.sgst_total))}</span></div>}
+              {invoice.is_interstate && <div className="flex justify-between"><span className="text-muted-foreground">IGST:</span><span className="font-mono">{formatINR(Number(invoice.igst_total))}</span></div>}
               <div className="flex justify-between border-t border-foreground pt-1 font-bold text-sm">
-                <span>Grand Total:</span><span className="font-mono">₹{Number(invoice.grand_total).toLocaleString()}</span>
+                <span>Grand Total:</span><span className="font-mono">{formatINR(Number(invoice.grand_total))}</span>
               </div>
             </div>
           </div>
