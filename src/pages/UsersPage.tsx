@@ -243,6 +243,7 @@ const UsersPage = () => {
               {loading ? (
                 <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
               ) : (
+                <>
                 <div className="space-y-4 md:hidden">
                   {users.map((u) => (
                     <div key={u.id} className="border rounded-lg p-3 space-y-3">
