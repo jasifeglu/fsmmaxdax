@@ -105,7 +105,7 @@ export const PurchaseRequests = ({ items }: Props) => {
                       <td className="py-2.5 text-right">
                         {req.status === "pending" && (
                           <div className="flex gap-1 justify-end">
-                            <Button size="sm" variant="ghost" className="h-7 w-7 p-0 text-green-600" onClick={() => handleApproval(req.id, "approved")}>
+                            <Button size="sm" variant="ghost" className="h-7 w-7 p-0 text-primary" onClick={() => handleApproval(req.id, "approved")}>
                               <Check className="h-3.5 w-3.5" />
                             </Button>
                             <Button size="sm" variant="ghost" className="h-7 w-7 p-0 text-destructive" onClick={() => handleApproval(req.id, "rejected")}>

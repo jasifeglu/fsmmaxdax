@@ -54,7 +54,7 @@ export const InventoryReports = ({ items }: Props) => {
     { name: "Critical", value: items.filter(i => i.status === "Critical").length },
   ].filter(d => d.value > 0);
 
-  const totalValue = items.reduce((s, i) => s + i.price * (i.warehouse_stock + i.van_stock), 0);
+  const totalValue = items.reduce((s: number, i: any) => s + Number(i.price) * (Number(i.warehouse_stock) + Number(i.van_stock)), 0);
 
   if (loading) return <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>;
 

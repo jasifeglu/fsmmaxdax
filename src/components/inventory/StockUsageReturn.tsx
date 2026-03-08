@@ -82,8 +82,8 @@ export const StockUsageReturn = ({ items, onRefresh }: Props) => {
       quantity: returnForm.quantity,
       from_location: "van",
       to_location: "warehouse",
-      user_id: userId,
-      performed_by: userId,
+      user_id: user?.id,
+      performed_by: user?.id,
       notes: returnForm.notes,
     });
     const newWarehouse = item.warehouse_stock + returnForm.quantity;

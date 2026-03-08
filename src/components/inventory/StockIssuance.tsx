@@ -56,7 +56,7 @@ export const StockIssuance = ({ items, onRefresh }: Props) => {
       from_location: "warehouse",
       to_location: "van",
       user_id: form.user_id,
-      performed_by: userId,
+      performed_by: user?.id,
       notes: form.notes,
     });
 
