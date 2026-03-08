@@ -137,8 +137,8 @@ export const InvoicePreview = ({ invoice, items, open, onOpenChange }: Props) =>
                   <td className="border border-border p-2">{item.description}</td>
                   <td className="border border-border p-2 font-mono">{item.hsn_sac_code || "—"}</td>
                   <td className="border border-border p-2 text-right">{Number(item.quantity)}</td>
-                  <td className="border border-border p-2 text-right">{Number(item.unit_price).toLocaleString()}</td>
-                  <td className="border border-border p-2 text-right">{Number(item.taxable_value).toLocaleString()}</td>
+                  <td className="border border-border p-2 text-right">{formatINR(Number(item.unit_price), false)}</td>
+                  <td className="border border-border p-2 text-right">{formatINR(Number(item.taxable_value), false)}</td>
                   {!invoice.is_interstate && <td className="border border-border p-2 text-right">{Number(item.cgst_rate)}%</td>}
                   {!invoice.is_interstate && <td className="border border-border p-2 text-right">{Number(item.sgst_rate)}%</td>}
                   {invoice.is_interstate && <td className="border border-border p-2 text-right">{Number(item.igst_rate)}%</td>}
