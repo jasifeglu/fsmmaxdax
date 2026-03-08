@@ -157,7 +157,7 @@ const TicketsPage = () => {
                   <Label className="text-xs">Product</Label>
                   <Select value={form.product_id} onValueChange={handleProductSelect}>
                     <SelectTrigger className="mt-1"><SelectValue placeholder="Select product" /></SelectTrigger>
-                    <SelectContent>{products.map(p => <SelectItem key={p.id} value={p.id}>{p.name} — ₹{Number(p.service_price).toLocaleString()}</SelectItem>)}</SelectContent>
+                    <SelectContent>{products.map(p => <SelectItem key={p.id} value={p.id}>{p.name} — {formatINR(Number(p.service_price))}</SelectItem>)}</SelectContent>
                   </Select>
                 </div>
               </div>
