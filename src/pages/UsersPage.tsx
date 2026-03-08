@@ -243,7 +243,62 @@ const UsersPage = () => {
               {loading ? (
                 <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
               ) : (
-                <div className="overflow-x-auto">
+                <div className="space-y-4 md:hidden">
+                  {users.map((u) => (
+                    <div key={u.id} className="border rounded-lg p-3 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium text-sm">{u.full_name || "—"}</p>
+                          <p className="text-xs text-muted-foreground">{u.email}</p>
+                        </div>
+                        {u.is_disabled ? (
+                          <Badge variant="destructive" className="text-[10px]">Disabled</Badge>
+                        ) : (
+                          <Badge className="text-[10px] bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400 hover:bg-emerald-100">Active</Badge>
+                        )}
+                      </div>
+                      <div>
+                        <Label className="text-[10px] text-muted-foreground">Role</Label>
+                        <Select value={u.role} onValueChange={(val) => handleRoleChange(u.id, val)}>
+                          <SelectTrigger className="w-full h-8 text-xs mt-1">
+                            <Shield className="h-3 w-3 mr-1" /><SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="admin">Admin</SelectItem>
+                            <SelectItem value="coordinator">Coordinator</SelectItem>
+                            <SelectItem value="technician">Technician</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        <Button variant="outline" size="sm" className="text-xs h-8 gap-1 flex-1" onClick={() => openResetDialog(u)}>
+                          <KeyRound className="h-3 w-3" /> Change Password
+                        </Button>
+                        <Button variant="outline" size="sm" className={`text-xs h-8 gap-1 ${u.is_disabled ? 'text-emerald-600' : 'text-amber-600'}`} onClick={() => handleToggleDisable(u)}>
+                          {u.is_disabled ? <><CheckCircle className="h-3 w-3" /> Enable</> : <><Ban className="h-3 w-3" /> Disable</>}
+                        </Button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button variant="outline" size="sm" className="text-xs h-8 text-destructive hover:text-destructive gap-1">
+                              <Trash2 className="h-3 w-3" /> Delete
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Delete User</AlertDialogTitle>
+                              <AlertDialogDescription>Remove {u.full_name || u.email}? This cannot be undone.</AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction onClick={() => handleDelete(u.id, u.full_name)}>Delete</AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="overflow-x-auto hidden md:block">
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="text-muted-foreground text-xs border-b">
