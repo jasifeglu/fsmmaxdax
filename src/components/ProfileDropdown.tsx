@@ -1,5 +1,6 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
   DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
@@ -7,14 +8,20 @@ import {
 import { User, LogOut, Settings } from "lucide-react";
 
 export const ProfileDropdown = () => {
-  const { userName, role, signOut } = useAuth();
+  const { userName, role, avatarUrl, signOut } = useAuth();
   const navigate = useNavigate();
+  const initial = userName.charAt(0).toUpperCase();
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-xs font-semibold text-primary-foreground hover:opacity-90 transition-opacity">
-          {userName.charAt(0).toUpperCase()}
+        <button className="h-8 w-8 rounded-full overflow-hidden hover:opacity-90 transition-opacity">
+          <Avatar className="h-8 w-8">
+            {avatarUrl && <AvatarImage src={avatarUrl} alt={userName} />}
+            <AvatarFallback className="text-xs font-semibold bg-primary text-primary-foreground">
+              {initial}
+            </AvatarFallback>
+          </Avatar>
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-48">
