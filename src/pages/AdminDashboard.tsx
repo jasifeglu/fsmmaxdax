@@ -51,7 +51,7 @@ export const AdminDashboard = () => {
   const monthlyRevenue = monthlyInvoices.reduce((s, inv) => s + Number(inv.grand_total || 0), 0);
   const pendingPayments = invoices.filter(inv => inv.payment_status === "Pending").reduce((s, inv) => s + Number(inv.grand_total || 0), 0);
 
-  const formatCurrency = (n: number) => n >= 100000 ? `₹${(n / 100000).toFixed(1)}L` : `₹${n.toLocaleString()}`;
+  const formatCurrency = formatINRCompact;
 
   const kpiData = {
     totalTicketsToday: todayTickets.length,
