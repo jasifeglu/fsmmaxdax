@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, useCallback, useRef, ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { User, Session } from "@supabase/supabase-js";
 
@@ -25,7 +25,6 @@ export const useAuth = () => {
 
 const getSignedAvatarUrl = async (path: string | null): Promise<string | null> => {
   if (!path) return null;
-  // If it's already a full URL (legacy), return as-is
   if (path.startsWith("http")) return path;
   const { data } = await supabase.storage.from("uploads").createSignedUrl(path, 3600);
   return data?.signedUrl || null;
@@ -38,29 +37,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [userName, setUserName] = useState("");
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const initializedRef = useRef(false);
 
   const fetchUserData = useCallback(async (userId: string) => {
-    // Fetch role
-    const { data: roleData } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", userId)
-      .single();
+    // Fetch role and profile in parallel
+    const [roleRes, profileRes] = await Promise.all([
+      supabase.from("user_roles").select("role").eq("user_id", userId).single(),
+      supabase.from("profiles").select("full_name, email, avatar_url").eq("id", userId).single(),
+    ]);
 
-    if (roleData) {
-      setRole(roleData.role as UserRole);
+    if (roleRes.data) {
+      setRole(roleRes.data.role as UserRole);
     }
 
-    // Fetch profile
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("full_name, email, avatar_url")
-      .eq("id", userId)
-      .single();
-
-    if (profile) {
-      setUserName(profile.full_name || profile.email || "User");
-      const signedUrl = await getSignedAvatarUrl(profile.avatar_url);
+    if (profileRes.data) {
+      setUserName(profileRes.data.full_name || profileRes.data.email || "User");
+      const signedUrl = await getSignedAvatarUrl(profileRes.data.avatar_url);
       setAvatarUrl(signedUrl);
     }
   }, []);
@@ -72,13 +64,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, [user, fetchUserData]);
 
   useEffect(() => {
+    // Set up listener FIRST (per Supabase best practice)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
 
         if (session?.user) {
-          // Log login
           if (_event === "SIGNED_IN") {
             supabase.from("audit_logs").insert({
               user_id: session.user.id,
@@ -96,24 +88,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           setUserName("");
           setAvatarUrl(null);
         }
+        initializedRef.current = true;
         setLoading(false);
       }
     );
 
+    // Then check existing session
     supabase.auth.getSession().then(async ({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        await fetchUserData(session.user.id);
+      // Only handle if onAuthStateChange hasn't fired yet
+      if (!initializedRef.current) {
+        setSession(session);
+        setUser(session?.user ?? null);
+        if (session?.user) {
+          await fetchUserData(session.user.id);
+        }
+        initializedRef.current = true;
+        setLoading(false);
       }
-      setLoading(false);
     });
 
     return () => subscription.unsubscribe();
   }, [fetchUserData]);
 
   const signOut = async () => {
-    // Log logout before signing out
     if (user) {
       await supabase.from("audit_logs").insert({
         user_id: user.id,
