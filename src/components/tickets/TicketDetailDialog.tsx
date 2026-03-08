@@ -22,6 +22,13 @@ interface TicketDetailDialogProps {
 
 export const TicketDetailDialog = ({ ticket, onClose, onRefresh }: TicketDetailDialogProps) => {
   const { role } = useAuth();
+  const [staffList, setStaffList] = useState<{ id: string; name: string }[]>([]);
+
+  useEffect(() => {
+    supabase.from("profiles").select("id, full_name").then(({ data }) => {
+      setStaffList((data || []).map((p: any) => ({ id: p.id, name: p.full_name })));
+    });
+  }, []);
 
   if (!ticket) return null;
 
