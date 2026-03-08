@@ -24,6 +24,7 @@ const navItems: NavItem[] = [
   { title: "Dashboard", url: "/", icon: LayoutDashboard, roles: ["admin", "coordinator", "technician"] },
   { title: "Tickets", url: "/tickets", icon: Ticket, roles: ["admin", "coordinator"] },
   { title: "Schedule", url: "/schedule", icon: Calendar, roles: ["admin", "coordinator"] },
+  { title: "Route Map", url: "/route-map", icon: Map, roles: ["admin", "coordinator", "technician"] },
   { title: "Customers", url: "/customers", icon: Users, roles: ["admin", "coordinator"] },
   { title: "Technicians", url: "/technicians", icon: Wrench, roles: ["admin", "coordinator"] },
   { title: "My Jobs", url: "/my-jobs", icon: ClipboardList, roles: ["technician"] },
