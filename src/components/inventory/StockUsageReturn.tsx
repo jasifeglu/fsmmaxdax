@@ -56,8 +56,8 @@ export const StockUsageReturn = ({ items, onRefresh }: Props) => {
       quantity: usageForm.quantity,
       from_location: "van",
       to_location: "customer",
-      user_id: userId,
-      performed_by: userId,
+      user_id: user?.id,
+      performed_by: user?.id,
       ticket_id: usageForm.ticket_id || null,
       notes: usageForm.notes,
     });
