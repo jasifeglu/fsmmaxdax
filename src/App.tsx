@@ -61,6 +61,7 @@ const ProtectedRoutes = () => {
         <Route path="/billing" element={<RoleGuard allowed={["admin", "technician"]}><BillingPage /></RoleGuard>} />
         <Route path="/travel-expenses" element={<RoleGuard allowed={["admin", "technician"]}><TravelExpensesPage /></RoleGuard>} />
         <Route path="/reports" element={<RoleGuard allowed={["admin"]}><ReportsPage /></RoleGuard>} />
+        <Route path="/incentives" element={<RoleGuard allowed={["admin", "technician"]}><IncentivesPage /></RoleGuard>} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/performance" element={<PerformancePage />} />
         <Route path="/user-monitoring" element={<RoleGuard allowed={["admin", "coordinator"]}><UserMonitoringPage /></RoleGuard>} />
