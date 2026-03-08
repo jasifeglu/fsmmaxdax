@@ -305,13 +305,13 @@ const TicketsPage = () => {
                   <div className="bg-muted/30 rounded-lg p-3 space-y-1">
                     <p className="text-xs font-medium text-muted-foreground">CHARGE BREAKDOWN</p>
                     {detailTicket.service_charge > 0 && (
-                      <div className="flex justify-between text-xs"><span>Service Charge</span><span className="font-mono">₹{Number(detailTicket.service_charge).toLocaleString()}</span></div>
+                      <div className="flex justify-between text-xs"><span>Service Charge</span><span className="font-mono">{formatINR(Number(detailTicket.service_charge))}</span></div>
                     )}
                     {detailTicket.distance_km && (
-                      <div className="flex justify-between text-xs"><span>Distance ({Number(detailTicket.distance_km).toFixed(1)} km)</span><span className="font-mono">₹{Number(detailTicket.distance_charge).toLocaleString()}</span></div>
+                      <div className="flex justify-between text-xs"><span>Distance ({Number(detailTicket.distance_km).toFixed(1)} km)</span><span className="font-mono">{formatINR(Number(detailTicket.distance_charge))}</span></div>
                     )}
                     <div className="flex justify-between text-xs font-semibold border-t border-border pt-1">
-                      <span>Total</span><span className="font-mono">₹{(Number(detailTicket.service_charge || 0) + Number(detailTicket.distance_charge || 0)).toLocaleString()}</span>
+                      <span>Total</span><span className="font-mono">{formatINR(Number(detailTicket.service_charge || 0) + Number(detailTicket.distance_charge || 0))}</span>
                     </div>
                   </div>
                 )}
