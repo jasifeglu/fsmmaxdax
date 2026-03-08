@@ -161,6 +161,63 @@ export type Database = {
         }
         Relationships: []
       }
+      inventory_transactions: {
+        Row: {
+          created_at: string
+          from_location: string
+          id: string
+          inventory_id: string
+          notes: string | null
+          performed_by: string
+          quantity: number
+          ticket_id: string | null
+          to_location: string
+          transaction_type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          from_location?: string
+          id?: string
+          inventory_id: string
+          notes?: string | null
+          performed_by: string
+          quantity?: number
+          ticket_id?: string | null
+          to_location?: string
+          transaction_type?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          from_location?: string
+          id?: string
+          inventory_id?: string
+          notes?: string | null
+          performed_by?: string
+          quantity?: number
+          ticket_id?: string | null
+          to_location?: string
+          transaction_type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inventory_transactions_inventory_id_fkey"
+            columns: ["inventory_id"]
+            isOneToOne: false
+            referencedRelation: "inventory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inventory_transactions_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           created_at: string
@@ -220,6 +277,53 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      purchase_requests: {
+        Row: {
+          approved_by: string | null
+          created_at: string
+          id: string
+          inventory_id: string
+          notes: string | null
+          reason: string
+          requested_by: string
+          requested_quantity: number
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          approved_by?: string | null
+          created_at?: string
+          id?: string
+          inventory_id: string
+          notes?: string | null
+          reason?: string
+          requested_by: string
+          requested_quantity?: number
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          approved_by?: string | null
+          created_at?: string
+          id?: string
+          inventory_id?: string
+          notes?: string | null
+          reason?: string
+          requested_by?: string
+          requested_quantity?: number
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "purchase_requests_inventory_id_fkey"
+            columns: ["inventory_id"]
+            isOneToOne: false
+            referencedRelation: "inventory"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       selfie_checkins: {
         Row: {
