@@ -16,16 +16,20 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import { WhatsAppPanel } from "@/components/WhatsAppPanel";
-import { SmartDispatchPanel } from "@/components/tickets/SmartDispatchPanel";
-import { Separator } from "@/components/ui/separator";
 import { calculateDistanceCharge, getProductServiceCharge } from "@/lib/distanceChargeUtils";
 import { formatINR } from "@/lib/formatINR";
+import { TicketDetailDialog } from "@/components/tickets/TicketDetailDialog";
 
 const CATEGORIES = [
   "General", "AC Repair", "Washing Machine", "Refrigerator", "Installation",
   "Plumbing", "Electrical", "Maintenance", "CCTV", "Home Automation",
   "Video Door Phone", "Networking", "Gates & Shutters", "Smart Locks",
+];
+
+const TICKET_STATUSES = [
+  "New", "Assigned", "Scheduled", "On-Site Attempt", "Pickup Required",
+  "Sent to Vendor", "Vendor Repairing", "Awaiting Return", "Returned from Vendor",
+  "Reinstallation", "Testing", "Completed", "Closed",
 ];
 
 const TicketsPage = () => {
@@ -45,6 +49,7 @@ const TicketsPage = () => {
     category: "General", priority: "Medium",
     product_id: "", customer_address: "",
     customer_latitude: "", customer_longitude: "",
+    complaint_description: "", customer_explanation: "",
   });
 
   const fetchTickets = async () => {
@@ -74,16 +79,13 @@ const TicketsPage = () => {
     let distanceKm: number | null = null;
     let distanceCharge = 0;
 
-    // Auto-fill service charge from product
     if (form.product_id) {
       const pc = await getProductServiceCharge(form.product_id);
       serviceCharge = pc.price;
     }
 
-    // Calculate distance charge if coordinates provided
     if (form.customer_latitude && form.customer_longitude) {
-      // Use a default base (Mumbai) for now – in production this would be the assigned tech's home
-      distanceKm = 15; // placeholder until tech assigned
+      distanceKm = 15;
       const dc = await calculateDistanceCharge(distanceKm);
       distanceCharge = dc.charge;
     }
@@ -104,6 +106,8 @@ const TicketsPage = () => {
       service_charge: serviceCharge,
       distance_km: distanceKm,
       distance_charge: distanceCharge,
+      complaint_description: form.complaint_description,
+      customer_explanation: form.customer_explanation,
     } as any);
 
     setCreating(false);
@@ -112,22 +116,19 @@ const TicketsPage = () => {
     } else {
       toast({ title: "Ticket created" });
       setDialogOpen(false);
-      setForm({ customer_name: "", customer_phone: "", issue: "", category: "General", priority: "Medium", product_id: "", customer_address: "", customer_latitude: "", customer_longitude: "" });
+      setForm({ customer_name: "", customer_phone: "", issue: "", category: "General", priority: "Medium", product_id: "", customer_address: "", customer_latitude: "", customer_longitude: "", complaint_description: "", customer_explanation: "" });
     }
   };
 
   const handleProductSelect = (productId: string) => {
-    setForm(f => ({ ...f, product_id: productId }));
     const p = products.find(pr => pr.id === productId);
-    if (p?.category) {
-      setForm(f => ({ ...f, product_id: productId, category: p.category }));
-    }
+    setForm(f => ({ ...f, product_id: productId, ...(p?.category ? { category: p.category } : {}) }));
   };
 
   const filtered = tickets.filter((t) => {
     const matchSearch = (t.customer_name || "").toLowerCase().includes(search.toLowerCase()) ||
       (t.ticket_number || "").toLowerCase().includes(search.toLowerCase());
-    const matchStatus = statusFilter === "all" || t.status?.toLowerCase() === statusFilter;
+    const matchStatus = statusFilter === "all" || t.status?.toLowerCase().replace(/\s+/g, "-") === statusFilter;
     return matchSearch && matchStatus;
   });
 
@@ -176,8 +177,16 @@ const TicketsPage = () => {
                 </div>
               </div>
               <div>
-                <Label className="text-xs">Issue</Label>
+                <Label className="text-xs">Issue Summary</Label>
                 <Textarea value={form.issue} onChange={(e) => setForm({ ...form, issue: e.target.value })} className="mt-1" rows={2} />
+              </div>
+              <div>
+                <Label className="text-xs">Detailed Complaint Description</Label>
+                <Textarea value={form.complaint_description} onChange={(e) => setForm({ ...form, complaint_description: e.target.value })} className="mt-1" rows={2} placeholder="Detailed problem description..." />
+              </div>
+              <div>
+                <Label className="text-xs">Customer Explanation</Label>
+                <Textarea value={form.customer_explanation} onChange={(e) => setForm({ ...form, customer_explanation: e.target.value })} className="mt-1" rows={2} placeholder="What the customer described..." />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
@@ -216,16 +225,12 @@ const TicketsPage = () => {
               <Input placeholder="Search tickets..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-8 h-9 text-sm" />
             </div>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-40 h-9 text-sm"><Filter className="h-3.5 w-3.5 mr-1.5" /><SelectValue placeholder="Status" /></SelectTrigger>
+              <SelectTrigger className="w-44 h-9 text-sm"><Filter className="h-3.5 w-3.5 mr-1.5" /><SelectValue placeholder="Status" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="new">New</SelectItem>
-                <SelectItem value="assigned">Assigned</SelectItem>
-                <SelectItem value="scheduled">Scheduled</SelectItem>
-                <SelectItem value="on-site">On-Site</SelectItem>
-                <SelectItem value="work-in-progress">In Progress</SelectItem>
-                <SelectItem value="completed">Completed</SelectItem>
-                <SelectItem value="closed">Closed</SelectItem>
+                {TICKET_STATUSES.map(s => (
+                  <SelectItem key={s} value={s.toLowerCase().replace(/\s+/g, "-")}>{s}</SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
@@ -260,7 +265,10 @@ const TicketsPage = () => {
                         </div>
                       </td>
                       <td className="py-2.5 text-muted-foreground hidden md:table-cell max-w-48 truncate">{t.issue}</td>
-                      <td className="py-2.5"><StatusBadge status={t.status} /></td>
+                      <td className="py-2.5">
+                        <StatusBadge status={t.status} />
+                        {t.delay_category && <StatusBadge status={t.delay_category} className="ml-1" />}
+                      </td>
                       <td className="py-2.5 hidden sm:table-cell"><StatusBadge status={t.priority} /></td>
                       <td className="py-2.5 text-muted-foreground hidden lg:table-cell">{t.assignee_name || "Unassigned"}</td>
                       <td className="py-2.5">
@@ -277,73 +285,7 @@ const TicketsPage = () => {
         </CardContent>
       </Card>
 
-      {/* Ticket Detail Dialog */}
-      <Dialog open={!!detailTicket} onOpenChange={(open) => { if (!open) setDetailTicket(null); }}>
-        <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
-          {detailTicket && (
-            <>
-              <DialogHeader>
-                <DialogTitle className="flex items-center gap-2">
-                  <span className="font-mono text-primary">{detailTicket.ticket_number}</span>
-                  <StatusBadge status={detailTicket.status} />
-                  <StatusBadge status={detailTicket.priority} />
-                </DialogTitle>
-                <DialogDescription>{detailTicket.issue}</DialogDescription>
-              </DialogHeader>
-              <div className="space-y-3 text-sm">
-                <div className="grid grid-cols-2 gap-3">
-                  <div><p className="text-xs text-muted-foreground">Customer</p><p className="font-medium">{detailTicket.customer_name}</p></div>
-                  <div><p className="text-xs text-muted-foreground">Phone</p><p className="font-medium">{detailTicket.customer_phone || "—"}</p></div>
-                  <div><p className="text-xs text-muted-foreground">Category</p><p className="font-medium">{detailTicket.category}</p></div>
-                  <div><p className="text-xs text-muted-foreground">Assigned To</p><p className="font-medium">{detailTicket.assignee_name || "Unassigned"}</p></div>
-                  <div><p className="text-xs text-muted-foreground">Created</p><p className="font-medium">{new Date(detailTicket.created_at).toLocaleDateString("en-IN", { dateStyle: "medium" })}</p></div>
-                  <div><p className="text-xs text-muted-foreground">Scheduled</p><p className="font-medium">{detailTicket.scheduled_at ? new Date(detailTicket.scheduled_at).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" }) : "Not scheduled"}</p></div>
-                </div>
-
-                {/* Charges breakdown */}
-                {(detailTicket.service_charge > 0 || detailTicket.distance_charge > 0) && (
-                  <div className="bg-muted/30 rounded-lg p-3 space-y-1">
-                    <p className="text-xs font-medium text-muted-foreground">CHARGE BREAKDOWN</p>
-                    {detailTicket.service_charge > 0 && (
-                      <div className="flex justify-between text-xs"><span>Service Charge</span><span className="font-mono">{formatINR(Number(detailTicket.service_charge))}</span></div>
-                    )}
-                    {detailTicket.distance_km && (
-                      <div className="flex justify-between text-xs"><span>Distance ({Number(detailTicket.distance_km).toFixed(1)} km)</span><span className="font-mono">{formatINR(Number(detailTicket.distance_charge))}</span></div>
-                    )}
-                    <div className="flex justify-between text-xs font-semibold border-t border-border pt-1">
-                      <span>Total</span><span className="font-mono">{formatINR(Number(detailTicket.service_charge || 0) + Number(detailTicket.distance_charge || 0))}</span>
-                    </div>
-                  </div>
-                )}
-
-                {detailTicket.customer_latitude && (
-                  <Button variant="outline" size="sm" className="w-full text-xs gap-1" asChild>
-                    <a href={`https://www.google.com/maps/dir/?api=1&destination=${detailTicket.customer_latitude},${detailTicket.customer_longitude}`} target="_blank" rel="noopener noreferrer">
-                      Navigate to Customer →
-                    </a>
-                  </Button>
-                )}
-
-                {detailTicket.notes && (
-                  <div><p className="text-xs text-muted-foreground">Notes</p><p className="text-sm mt-0.5">{detailTicket.notes}</p></div>
-                )}
-
-                <Separator />
-
-                {/* Smart Dispatch */}
-                {(!detailTicket.assigned_to || detailTicket.status === "New") && (
-                  <>
-                    <SmartDispatchPanel ticket={detailTicket} onAssigned={() => { fetchTickets(); setDetailTicket(null); }} />
-                    <Separator />
-                  </>
-                )}
-
-                <WhatsAppPanel ticket={detailTicket} />
-              </div>
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
+      <TicketDetailDialog ticket={detailTicket} onClose={() => setDetailTicket(null)} onRefresh={() => { fetchTickets(); setDetailTicket(null); }} />
     </div>
   );
 };
