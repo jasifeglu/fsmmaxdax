@@ -35,6 +35,7 @@ const UsersPage = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [newEmail, setNewEmail] = useState("");
   const [newName, setNewName] = useState("");
+  const [newPassword, setNewPassword] = useState("");
   const [newRole, setNewRole] = useState("technician");
 
   const fetchUsers = async () => {
