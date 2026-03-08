@@ -13,7 +13,7 @@ interface Props {
 
 export const PurchaseRequests = ({ items }: Props) => {
   const { toast } = useToast();
-  const { userId, role } = useAuth();
+  const { user, role } = useAuth();
   const [requests, setRequests] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
