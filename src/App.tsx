@@ -16,6 +16,8 @@ import BillingPage from "./pages/BillingPage";
 import ReportsPage from "./pages/ReportsPage";
 import UsersPage from "./pages/UsersPage";
 import SchedulePage from "./pages/SchedulePage";
+import ProductCatalogPage from "./pages/ProductCatalogPage";
+import RouteMapPage from "./pages/RouteMapPage";
 import SettingsPage from "./pages/SettingsPage";
 import ProfilePage from "./pages/ProfilePage";
 import PerformancePage from "./pages/PerformancePage";
