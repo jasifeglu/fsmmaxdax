@@ -366,6 +366,7 @@ const UsersPage = () => {
                     </tbody>
                   </table>
                 </div>
+                </>
               )}
             </CardContent>
           </Card>
