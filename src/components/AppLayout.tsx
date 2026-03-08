@@ -1,11 +1,12 @@
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { useAuth } from "@/contexts/AuthContext";
-import { Search } from "lucide-react";
+import { Search, FlaskConical } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { ProfileDropdown } from "@/components/ProfileDropdown";
 import { NotificationsDropdown } from "@/components/NotificationsDropdown";
+import { supabase } from "@/integrations/supabase/client";
 
 const roleTitles = {
   admin: "Admin Panel",
@@ -15,12 +16,36 @@ const roleTitles = {
 
 export const AppLayout = ({ children }: { children: ReactNode }) => {
   const { role } = useAuth();
+  const [demoMode, setDemoMode] = useState(false);
+
+  useEffect(() => {
+    const check = async () => {
+      const { data } = await supabase
+        .from("app_settings")
+        .select("value")
+        .eq("key", "mock_data_enabled")
+        .single();
+      setDemoMode(data?.value === "true");
+    };
+    check();
+    const ch = supabase
+      .channel("demo-mode-watch")
+      .on("postgres_changes", { event: "*", schema: "public", table: "app_settings" }, () => check())
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, []);
 
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
         <AppSidebar />
         <div className="flex-1 flex flex-col min-w-0">
+          {demoMode && (
+            <div className="bg-yellow-500/10 border-b border-yellow-500/30 px-4 py-1.5 flex items-center justify-center gap-2">
+              <FlaskConical className="h-3.5 w-3.5 text-yellow-500" />
+              <span className="text-xs font-medium text-yellow-500">DEMO MODE — Mock data is active</span>
+            </div>
+          )}
           <header className="h-14 flex items-center justify-between border-b bg-card/50 backdrop-blur-sm px-4 sticky top-0 z-30">
             <div className="flex items-center gap-3">
               <SidebarTrigger className="text-muted-foreground" />

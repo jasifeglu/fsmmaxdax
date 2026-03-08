@@ -11,8 +11,10 @@ import { CommunicationSettings } from "@/components/settings/CommunicationSettin
 import { InventorySettings, BillingSettings, KPISettings } from "@/components/settings/OperationalSettings";
 import { SecuritySettings } from "@/components/settings/SecuritySettings";
 import { IntegrationSettings, AppearanceSettings, DataSettings } from "@/components/settings/SystemSettings";
+import { MockDataSettings } from "@/components/settings/MockDataSettings";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { FlaskConical } from "lucide-react";
 
 const tabs = [
   { id: "general", label: "General", icon: Building2 },
@@ -28,6 +30,7 @@ const tabs = [
   { id: "integrations", label: "Integrations", icon: Link2 },
   { id: "appearance", label: "Appearance", icon: Palette },
   { id: "data", label: "Data Management", icon: Database },
+  { id: "mockdata", label: "Mock Data", icon: FlaskConical },
 ];
 
 const SettingsPage = () => {
@@ -55,6 +58,7 @@ const SettingsPage = () => {
       case "integrations": return <IntegrationSettings settings={settings} update={update} />;
       case "appearance": return <AppearanceSettings settings={settings} update={update} />;
       case "data": return <DataSettings settings={settings} update={update} />;
+      case "mockdata": return <MockDataSettings settings={settings} update={update} />;
       default: return null;
     }
   };
