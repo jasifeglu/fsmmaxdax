@@ -35,7 +35,7 @@ export const TechnicianDashboard = () => {
         .from("tickets")
         .select("*")
         .eq("assigned_to", user?.id)
-        .in("status", ["Assigned", "Scheduled", "On-Site", "Work-In-Progress"])
+        .in("status", ["Assigned", "Scheduled", "On-Site Attempt", "Reinstallation", "Testing"])
         .order("scheduled_at", { ascending: true });
       setJobs(data || []);
       setLoading(false);
