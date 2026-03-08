@@ -95,8 +95,8 @@ export const IncentiveDashboard = () => {
               <div className="mx-auto h-20 w-20 rounded-full bg-success/10 flex items-center justify-center">
                 <DollarSign className="h-8 w-8 text-success" />
               </div>
-              <p className="text-2xl font-bold">₹{d.earnings.totalEarnings.toLocaleString()}</p>
-              <p className="text-xs text-muted-foreground">Total Earnings (incl. ₹{d.earnings.totalIncentive.toLocaleString()} incentive)</p>
+              <p className="text-2xl font-bold">{formatINR(d.earnings.totalEarnings)}</p>
+              <p className="text-xs text-muted-foreground">Total Earnings (incl. {formatINR(d.earnings.totalIncentive)} incentive)</p>
             </CardContent>
           </Card>
         </motion.div>
