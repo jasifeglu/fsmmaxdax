@@ -16,6 +16,24 @@ const roleTitles = {
 
 export const AppLayout = ({ children }: { children: ReactNode }) => {
   const { role } = useAuth();
+  const [demoMode, setDemoMode] = useState(false);
+
+  useEffect(() => {
+    const check = async () => {
+      const { data } = await supabase
+        .from("app_settings")
+        .select("value")
+        .eq("key", "mock_data_enabled")
+        .single();
+      setDemoMode(data?.value === "true");
+    };
+    check();
+    const ch = supabase
+      .channel("demo-mode-watch")
+      .on("postgres_changes", { event: "*", schema: "public", table: "app_settings" }, () => check())
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, []);
 
   return (
     <SidebarProvider>
