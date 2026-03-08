@@ -218,6 +218,168 @@ export type Database = {
           },
         ]
       }
+      invoice_items: {
+        Row: {
+          cgst_rate: number
+          created_at: string
+          description: string
+          hsn_sac_code: string | null
+          id: string
+          igst_rate: number
+          inventory_id: string | null
+          invoice_id: string
+          quantity: number
+          sgst_rate: number
+          tax_amount: number
+          taxable_value: number
+          total_amount: number
+          unit_price: number
+        }
+        Insert: {
+          cgst_rate?: number
+          created_at?: string
+          description?: string
+          hsn_sac_code?: string | null
+          id?: string
+          igst_rate?: number
+          inventory_id?: string | null
+          invoice_id: string
+          quantity?: number
+          sgst_rate?: number
+          tax_amount?: number
+          taxable_value?: number
+          total_amount?: number
+          unit_price?: number
+        }
+        Update: {
+          cgst_rate?: number
+          created_at?: string
+          description?: string
+          hsn_sac_code?: string | null
+          id?: string
+          igst_rate?: number
+          inventory_id?: string | null
+          invoice_id?: string
+          quantity?: number
+          sgst_rate?: number
+          tax_amount?: number
+          taxable_value?: number
+          total_amount?: number
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoice_items_inventory_id_fkey"
+            columns: ["inventory_id"]
+            isOneToOne: false
+            referencedRelation: "inventory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoice_items_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      invoices: {
+        Row: {
+          amount_in_words: string | null
+          cgst_total: number
+          created_at: string
+          created_by: string | null
+          customer_address: string | null
+          customer_gstin: string | null
+          customer_id: string | null
+          customer_name: string
+          customer_phone: string | null
+          grand_total: number
+          id: string
+          igst_total: number
+          invoice_date: string
+          invoice_number: string
+          is_interstate: boolean
+          notes: string | null
+          payment_mode: string
+          payment_status: string
+          place_of_supply: string
+          sgst_total: number
+          subtotal: number
+          ticket_id: string | null
+          transaction_reference: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount_in_words?: string | null
+          cgst_total?: number
+          created_at?: string
+          created_by?: string | null
+          customer_address?: string | null
+          customer_gstin?: string | null
+          customer_id?: string | null
+          customer_name?: string
+          customer_phone?: string | null
+          grand_total?: number
+          id?: string
+          igst_total?: number
+          invoice_date?: string
+          invoice_number: string
+          is_interstate?: boolean
+          notes?: string | null
+          payment_mode?: string
+          payment_status?: string
+          place_of_supply?: string
+          sgst_total?: number
+          subtotal?: number
+          ticket_id?: string | null
+          transaction_reference?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount_in_words?: string | null
+          cgst_total?: number
+          created_at?: string
+          created_by?: string | null
+          customer_address?: string | null
+          customer_gstin?: string | null
+          customer_id?: string | null
+          customer_name?: string
+          customer_phone?: string | null
+          grand_total?: number
+          id?: string
+          igst_total?: number
+          invoice_date?: string
+          invoice_number?: string
+          is_interstate?: boolean
+          notes?: string | null
+          payment_mode?: string
+          payment_status?: string
+          place_of_supply?: string
+          sgst_total?: number
+          subtotal?: number
+          ticket_id?: string | null
+          transaction_reference?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoices_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoices_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           created_at: string
