@@ -42,9 +42,9 @@ export const AdminDashboard = () => {
 
   const today = new Date().toISOString().slice(0, 10);
   const todayTickets = tickets.filter(t => t.created_at?.slice(0, 10) === today);
-  const activeJobs = tickets.filter(t => ["Assigned", "Scheduled", "On-Site", "Work-In-Progress"].includes(t.status));
-  const pendingTickets = tickets.filter(t => ["New", "Pending"].includes(t.status));
-  const completedTickets = tickets.filter(t => t.status === "Completed" || t.status === "Closed");
+  const activeJobs = tickets.filter(t => ["Assigned", "Scheduled", "On-Site Attempt", "Reinstallation", "Testing"].includes(t.status));
+  const pendingTickets = tickets.filter(t => ["New"].includes(t.status));
+  const completedTickets = tickets.filter(t => ["Completed", "Closed"].includes(t.status));
   const lowStockItems = inventory.filter(i => i.status !== "OK");
 
   const monthStart = new Date(); monthStart.setDate(1); monthStart.setHours(0, 0, 0, 0);
