@@ -148,7 +148,7 @@ export const WarehouseCatalog = ({ items, loading, onRefresh }: Props) => {
                     <td className="py-2.5 text-right font-mono">{item.warehouse_stock}</td>
                     <td className="py-2.5 text-right font-mono">{item.van_stock}</td>
                     <td className="py-2.5 text-right text-muted-foreground hidden lg:table-cell">{item.min_stock}</td>
-                    <td className="py-2.5 text-right hidden lg:table-cell">₹{Number(item.price).toLocaleString()}</td>
+                    <td className="py-2.5 text-right hidden lg:table-cell">{formatINR(Number(item.price))}</td>
                     <td className="py-2.5">
                       <StatusBadge status={item.status === "OK" ? "Available" : item.status === "Low" ? "Pending" : "Critical"} />
                     </td>

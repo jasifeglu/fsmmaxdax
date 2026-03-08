@@ -9,6 +9,7 @@ import { InventoryAlertPanel } from "@/components/dashboard/InventoryAlertPanel"
 import { AlertsNotificationsPanel } from "@/components/dashboard/AlertsNotificationsPanel";
 import { QuickActions } from "@/components/dashboard/QuickActions";
 import { supabase } from "@/integrations/supabase/client";
+import { formatINRCompact } from "@/lib/formatINR";
 
 export const AdminDashboard = () => {
   const [tickets, setTickets] = useState<any[]>([]);

@@ -174,7 +174,7 @@ const TravelExpensesPage = () => {
                       <td className="py-2.5 text-xs">{new Date(e.expense_date).toLocaleDateString()}</td>
                       <td className="py-2.5 capitalize">{e.expense_type}</td>
                       <td className="py-2.5 text-muted-foreground hidden sm:table-cell truncate max-w-40">{e.description || "—"}</td>
-                      <td className="py-2.5 text-right font-medium">₹{Number(e.amount).toLocaleString()}</td>
+                      <td className="py-2.5 text-right font-medium">{formatINR(Number(e.amount))}</td>
                       <td className="py-2.5 text-right text-muted-foreground hidden md:table-cell">{e.distance_km ? `${e.distance_km} km` : "—"}</td>
                       <td className="py-2.5"><StatusBadge status={e.status === "approved" ? "Completed" : e.status === "rejected" ? "Critical" : "Pending"} /></td>
                     </tr>

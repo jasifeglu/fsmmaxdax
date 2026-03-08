@@ -313,11 +313,11 @@ export const InvoiceForm = ({ onCreated }: Props) => {
           <Card className="border-border/50 bg-muted/30">
             <CardContent className="py-4">
               <div className="grid grid-cols-2 gap-2 text-sm">
-                <span className="text-muted-foreground">Subtotal:</span><span className="text-right font-mono">₹{subtotal.toLocaleString()}</span>
-                {!form.is_interstate && <><span className="text-muted-foreground">CGST:</span><span className="text-right font-mono">₹{cgstTotal.toLocaleString()}</span></>}
-                {!form.is_interstate && <><span className="text-muted-foreground">SGST:</span><span className="text-right font-mono">₹{sgstTotal.toLocaleString()}</span></>}
-                {form.is_interstate && <><span className="text-muted-foreground">IGST:</span><span className="text-right font-mono">₹{igstTotal.toLocaleString()}</span></>}
-                <span className="font-semibold border-t border-border pt-2">Grand Total:</span><span className="text-right font-mono font-bold text-lg border-t border-border pt-2">₹{grandTotal.toLocaleString()}</span>
+                <span className="text-muted-foreground">Subtotal:</span><span className="text-right font-mono">{formatINR(subtotal)}</span>
+                {!form.is_interstate && <><span className="text-muted-foreground">CGST:</span><span className="text-right font-mono">{formatINR(cgstTotal)}</span></>}
+                {!form.is_interstate && <><span className="text-muted-foreground">SGST:</span><span className="text-right font-mono">{formatINR(sgstTotal)}</span></>}
+                {form.is_interstate && <><span className="text-muted-foreground">IGST:</span><span className="text-right font-mono">{formatINR(igstTotal)}</span></>}
+                <span className="font-semibold border-t border-border pt-2">Grand Total:</span><span className="text-right font-mono font-bold text-lg border-t border-border pt-2">{formatINR(grandTotal)}</span>
               </div>
               <p className="text-xs text-muted-foreground mt-2 italic">{numberToWords(grandTotal)}</p>
             </CardContent>

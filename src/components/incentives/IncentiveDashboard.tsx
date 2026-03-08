@@ -144,7 +144,7 @@ export const IncentiveDashboard = () => {
               ))}
               <div className="flex items-center justify-between text-sm py-2 font-bold">
                 <span>Total Earnings</span>
-                <span className="text-primary font-mono">₹{d.earnings.totalEarnings.toLocaleString()}</span>
+                <span className="text-primary font-mono">{formatINR(d.earnings.totalEarnings)}</span>
               </div>
             </div>
           </CardContent>

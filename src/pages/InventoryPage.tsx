@@ -35,7 +35,7 @@ const InventoryPage = () => {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
         <StatCard title="Total SKUs" value={items.length} icon={Package} iconColor="text-primary" />
         <StatCard title="Low Stock Alerts" value={lowItems} changeType="negative" icon={AlertTriangle} iconColor="text-warning" />
-        <StatCard title="Warehouse Value" value={`₹${totalValue.toLocaleString()}`} icon={TrendingDown} iconColor="text-info" />
+        <StatCard title="Warehouse Value" value={formatINR(totalValue)} icon={TrendingDown} iconColor="text-info" />
         <StatCard title="Van Stock Units" value={totalVanStock} icon={Truck} iconColor="text-accent-foreground" />
       </div>
 

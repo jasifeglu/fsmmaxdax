@@ -85,7 +85,7 @@ export const InvoiceHistory = ({ refreshKey }: Props) => {
                       <td className="py-2.5 font-mono text-xs text-primary">{inv.invoice_number}</td>
                       <td className="py-2.5 font-medium">{inv.customer_name}</td>
                       <td className="py-2.5 text-muted-foreground text-xs hidden sm:table-cell">{inv.invoice_date}</td>
-                      <td className="py-2.5 text-right font-mono font-semibold">₹{Number(inv.grand_total).toLocaleString()}</td>
+                      <td className="py-2.5 text-right font-mono font-semibold">{formatINR(Number(inv.grand_total))}</td>
                       <td className="py-2.5">
                         <button onClick={() => handleStatusUpdate(inv.id, inv.payment_status === "Pending" ? "Paid" : "Pending")} className="cursor-pointer">
                           <StatusBadge status={statusMap[inv.payment_status] || inv.payment_status} />

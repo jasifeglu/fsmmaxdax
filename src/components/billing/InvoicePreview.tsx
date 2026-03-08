@@ -152,12 +152,12 @@ export const InvoicePreview = ({ invoice, items, open, onOpenChange }: Props) =>
           {/* Tax Summary */}
           <div className="flex justify-end mb-4">
             <div className="w-64 space-y-1 text-xs">
-              <div className="flex justify-between"><span className="text-muted-foreground">Subtotal:</span><span className="font-mono">₹{Number(invoice.subtotal).toLocaleString()}</span></div>
-              {!invoice.is_interstate && <div className="flex justify-between"><span className="text-muted-foreground">CGST:</span><span className="font-mono">₹{Number(invoice.cgst_total).toLocaleString()}</span></div>}
-              {!invoice.is_interstate && <div className="flex justify-between"><span className="text-muted-foreground">SGST:</span><span className="font-mono">₹{Number(invoice.sgst_total).toLocaleString()}</span></div>}
-              {invoice.is_interstate && <div className="flex justify-between"><span className="text-muted-foreground">IGST:</span><span className="font-mono">₹{Number(invoice.igst_total).toLocaleString()}</span></div>}
+              <div className="flex justify-between"><span className="text-muted-foreground">Subtotal:</span><span className="font-mono">{formatINR(Number(invoice.subtotal))}</span></div>
+              {!invoice.is_interstate && <div className="flex justify-between"><span className="text-muted-foreground">CGST:</span><span className="font-mono">{formatINR(Number(invoice.cgst_total))}</span></div>}
+              {!invoice.is_interstate && <div className="flex justify-between"><span className="text-muted-foreground">SGST:</span><span className="font-mono">{formatINR(Number(invoice.sgst_total))}</span></div>}
+              {invoice.is_interstate && <div className="flex justify-between"><span className="text-muted-foreground">IGST:</span><span className="font-mono">{formatINR(Number(invoice.igst_total))}</span></div>}
               <div className="flex justify-between border-t border-foreground pt-1 font-bold text-sm">
-                <span>Grand Total:</span><span className="font-mono">₹{Number(invoice.grand_total).toLocaleString()}</span>
+                <span>Grand Total:</span><span className="font-mono">{formatINR(Number(invoice.grand_total))}</span>
               </div>
             </div>
           </div>

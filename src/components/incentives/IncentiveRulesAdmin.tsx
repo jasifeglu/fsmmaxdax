@@ -105,7 +105,7 @@ export const IncentiveRulesAdmin = () => {
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium">{rule.name}</p>
                 <p className="text-xs text-muted-foreground">
-                  {typeLabels[rule.type]} · Target: {rule.target_value} ({metricLabels[rule.metric]}) → Reward: {rule.reward_unit === "percentage" ? `${rule.reward_value}%` : `₹${rule.reward_value.toLocaleString()}`}
+                  {typeLabels[rule.type]} · Target: {rule.target_value} ({metricLabels[rule.metric]}) → Reward: {rule.reward_unit === "percentage" ? `${rule.reward_value}%` : formatINR(rule.reward_value)}
                 </p>
               </div>
               <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => openEdit(rule)}>
