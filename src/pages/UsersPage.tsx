@@ -54,19 +54,20 @@ const UsersPage = () => {
   useEffect(() => { fetchUsers(); }, []);
 
   const handleCreate = async () => {
-    if (!newEmail || !newName) return;
+    if (!newEmail || !newName || !newPassword) return;
     setCreating(true);
     const { data, error } = await supabase.functions.invoke("admin-users", {
-      body: { action: "create_user", email: newEmail, full_name: newName, role: newRole },
+      body: { action: "create_user", email: newEmail, full_name: newName, role: newRole, password: newPassword },
     });
     setCreating(false);
     if (error || data?.error) {
       toast({ title: "Error", description: data?.error || "Failed to create user", variant: "destructive" });
     } else {
-      toast({ title: "User created", description: `${newName} can now login via OTP` });
+      toast({ title: "User created", description: `${newName} can now login with email & password` });
       setDialogOpen(false);
       setNewEmail("");
       setNewName("");
+      setNewPassword("");
       setNewRole("technician");
       fetchUsers();
     }
