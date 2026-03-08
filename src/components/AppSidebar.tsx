@@ -4,7 +4,7 @@ import { useAuth, UserRole } from "@/contexts/AuthContext";
 import {
   LayoutDashboard, Ticket, Users, Wrench, Package, DollarSign,
   BarChart3, Settings, Calendar, ClipboardList,
-  Zap, User, TrendingUp, Eye, LogOut, UserCog,
+  Zap, User, TrendingUp, Eye, LogOut, UserCog, Car,
 } from "lucide-react";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent,
