@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 import { useAuth, UserRole } from "@/contexts/AuthContext";
 import {
   LayoutDashboard, Ticket, Users, Wrench, Package, DollarSign,
-  BarChart3, Settings, Calendar, ClipboardList,
+  BarChart3, Settings, Calendar, ClipboardList, Map, ShoppingBag,
   Zap, User, TrendingUp, Eye, LogOut, UserCog, Car, Trophy,
 } from "lucide-react";
 import {
