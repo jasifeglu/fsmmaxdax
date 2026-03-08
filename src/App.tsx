@@ -8,6 +8,7 @@ import { AppLayout } from "@/components/AppLayout";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import AuthPage from "./pages/AuthPage";
+import InstallPage from "./pages/InstallPage";
 import TicketsPage from "./pages/TicketsPage";
 import CustomersPage from "./pages/CustomersPage";
 import TechniciansPage from "./pages/TechniciansPage";
@@ -99,6 +100,7 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/auth" element={<PublicRoute><AuthPage /></PublicRoute>} />
+            <Route path="/install" element={<InstallPage />} />
             <Route path="/*" element={<ProtectedRoutes />} />
           </Routes>
         </BrowserRouter>
