@@ -80,7 +80,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (session?.user) {
           // Log login
           if (_event === "SIGNED_IN") {
-            await supabase.from("audit_logs").insert({
+            supabase.from("audit_logs").insert({
               user_id: session.user.id,
               user_name: session.user.user_metadata?.full_name || session.user.email || "",
               user_role: "",
@@ -90,7 +90,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               device_info: navigator.userAgent.slice(0, 120),
             }).then(() => {});
           }
-          setTimeout(() => fetchUserData(session.user.id), 0);
+          await fetchUserData(session.user.id);
         } else {
           setRole("technician");
           setUserName("");
@@ -100,11 +100,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     );
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
-        fetchUserData(session.user.id);
+        await fetchUserData(session.user.id);
       }
       setLoading(false);
     });
