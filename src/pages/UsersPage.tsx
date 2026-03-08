@@ -121,6 +121,10 @@ const UsersPage = () => {
                 <Input type="email" value={newEmail} onChange={(e) => setNewEmail(e.target.value)} placeholder="user@example.com" className="mt-1" />
               </div>
               <div>
+                <Label className="text-xs">Password</Label>
+                <Input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="Set a password" className="mt-1" />
+              </div>
+              <div>
                 <Label className="text-xs">Role</Label>
                 <Select value={newRole} onValueChange={setNewRole}>
                   <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
