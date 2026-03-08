@@ -6,6 +6,7 @@ import { StatusBadge } from "@/components/StatusBadge";
 import { Search, Eye, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { InvoicePreview } from "./InvoicePreview";
+import { formatINR } from "@/lib/formatINR";
 
 interface Props {
   refreshKey: number;
