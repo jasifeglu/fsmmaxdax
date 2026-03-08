@@ -137,8 +137,8 @@ export const IncentiveDashboard = () => {
               ].map((item) => (
                 <div key={item.label} className="flex items-center justify-between text-sm py-1.5 border-b border-border/30">
                   <span className="text-muted-foreground">{item.label}</span>
-                  <span className={cn("font-mono font-medium", item.highlight && item.value > 0 && "text-success")}>
-                    ₹{item.value.toLocaleString()}
+                   <span className={cn("font-mono font-medium", item.highlight && item.value > 0 && "text-success")}>
+                    {formatINR(item.value)}
                   </span>
                 </div>
               ))}
