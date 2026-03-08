@@ -40,6 +40,12 @@ export const AppLayout = ({ children }: { children: ReactNode }) => {
       <div className="min-h-screen flex w-full">
         <AppSidebar />
         <div className="flex-1 flex flex-col min-w-0">
+          {demoMode && (
+            <div className="bg-yellow-500/10 border-b border-yellow-500/30 px-4 py-1.5 flex items-center justify-center gap-2">
+              <FlaskConical className="h-3.5 w-3.5 text-yellow-500" />
+              <span className="text-xs font-medium text-yellow-500">DEMO MODE — Mock data is active</span>
+            </div>
+          )}
           <header className="h-14 flex items-center justify-between border-b bg-card/50 backdrop-blur-sm px-4 sticky top-0 z-30">
             <div className="flex items-center gap-3">
               <SidebarTrigger className="text-muted-foreground" />
