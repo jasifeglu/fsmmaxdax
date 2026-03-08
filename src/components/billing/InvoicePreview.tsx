@@ -53,7 +53,7 @@ export const InvoicePreview = ({ invoice, items, open, onOpenChange }: Props) =>
 
   const handleWhatsApp = () => {
     const text = encodeURIComponent(
-      `Invoice: ${invoice.invoice_number}\nCustomer: ${invoice.customer_name}\nAmount: ₹${Number(invoice.grand_total).toLocaleString()}\nDate: ${invoice.invoice_date}\nStatus: ${invoice.payment_status}`
+      `Invoice: ${invoice.invoice_number}\nCustomer: ${invoice.customer_name}\nAmount: ${formatINR(Number(invoice.grand_total))}\nDate: ${invoice.invoice_date}\nStatus: ${invoice.payment_status}`
     );
     const phone = invoice.customer_phone ? invoice.customer_phone.replace(/\D/g, '') : '';
     const url = phone ? `https://wa.me/${phone}?text=${text}` : `https://wa.me/?text=${text}`;
