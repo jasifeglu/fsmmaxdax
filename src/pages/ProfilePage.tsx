@@ -56,8 +56,8 @@ const ProfilePage = () => {
   };
 
   const handleChangePassword = async () => {
-    if (newPassword.length < 6) {
-      toast({ title: "Error", description: "Password must be at least 6 characters", variant: "destructive" });
+    if (newPassword.length < 8) {
+      toast({ title: "Error", description: "Password must be at least 8 characters", variant: "destructive" });
       return;
     }
     setChangingPw(true);
