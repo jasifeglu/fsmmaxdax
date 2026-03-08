@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Package, Plus, Search, Loader2, Trash2, Edit } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { formatINR } from "@/lib/formatINR";
 
 const CATEGORIES = ["Electrical", "Mechanical", "Accessories", "Consumables", "General"];
 
