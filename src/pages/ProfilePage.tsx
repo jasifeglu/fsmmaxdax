@@ -156,7 +156,7 @@ const ProfilePage = () => {
               <div className="space-y-4">
                 <div>
                   <Label className="text-xs">New Password</Label>
-                  <Input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="Min 6 characters" className="mt-1" />
+                  <Input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="Min 8 characters" className="mt-1" />
                 </div>
                 <Button onClick={handleChangePassword} disabled={changingPw} className="w-full">
                   {changingPw && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
