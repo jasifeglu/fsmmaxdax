@@ -30,6 +30,7 @@ const tabs = [
   { id: "integrations", label: "Integrations", icon: Link2 },
   { id: "appearance", label: "Appearance", icon: Palette },
   { id: "data", label: "Data Management", icon: Database },
+  { id: "mockdata", label: "Mock Data", icon: FlaskConical },
 ];
 
 const SettingsPage = () => {
