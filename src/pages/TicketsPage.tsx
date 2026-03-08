@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Search, Plus, Filter, Loader2 } from "lucide-react";
+import { Search, Plus, Filter, Loader2, Eye } from "lucide-react";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
@@ -16,6 +16,8 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
+import { WhatsAppPanel } from "@/components/WhatsAppPanel";
+import { Separator } from "@/components/ui/separator";
 
 const TicketsPage = () => {
   const { toast } = useToast();
@@ -26,8 +28,8 @@ const TicketsPage = () => {
   const [statusFilter, setStatusFilter] = useState("all");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [creating, setCreating] = useState(false);
+  const [detailTicket, setDetailTicket] = useState<any | null>(null);
 
-  // New ticket form
   const [form, setForm] = useState({
     customer_name: "", customer_phone: "", issue: "",
     category: "General", priority: "Medium",
@@ -45,7 +47,6 @@ const TicketsPage = () => {
 
   useEffect(() => {
     fetchTickets();
-    // Realtime subscription
     const channel = supabase
       .channel("tickets-changes")
       .on("postgres_changes", { event: "*", schema: "public", table: "tickets" }, () => fetchTickets())
@@ -190,6 +191,7 @@ const TicketsPage = () => {
                     <th className="text-left py-2 font-medium">Status</th>
                     <th className="text-left py-2 font-medium hidden sm:table-cell">Priority</th>
                     <th className="text-left py-2 font-medium hidden lg:table-cell">Assignee</th>
+                    <th className="text-left py-2 font-medium">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -206,6 +208,16 @@ const TicketsPage = () => {
                       <td className="py-2.5"><StatusBadge status={t.status} /></td>
                       <td className="py-2.5 hidden sm:table-cell"><StatusBadge status={t.priority} /></td>
                       <td className="py-2.5 text-muted-foreground hidden lg:table-cell">{t.assignee_name || "Unassigned"}</td>
+                      <td className="py-2.5">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 text-xs gap-1"
+                          onClick={() => setDetailTicket(t)}
+                        >
+                          <Eye className="h-3 w-3" /> View
+                        </Button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -214,6 +226,68 @@ const TicketsPage = () => {
           )}
         </CardContent>
       </Card>
+
+      {/* Ticket Detail Dialog with WhatsApp */}
+      <Dialog open={!!detailTicket} onOpenChange={(open) => { if (!open) setDetailTicket(null); }}>
+        <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
+          {detailTicket && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <span className="font-mono text-primary">{detailTicket.ticket_number}</span>
+                  <StatusBadge status={detailTicket.status} />
+                  <StatusBadge status={detailTicket.priority} />
+                </DialogTitle>
+                <DialogDescription>{detailTicket.issue}</DialogDescription>
+              </DialogHeader>
+
+              <div className="space-y-3 text-sm">
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <p className="text-xs text-muted-foreground">Customer</p>
+                    <p className="font-medium">{detailTicket.customer_name}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">Phone</p>
+                    <p className="font-medium">{detailTicket.customer_phone || "—"}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">Category</p>
+                    <p className="font-medium">{detailTicket.category}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">Assigned To</p>
+                    <p className="font-medium">{detailTicket.assignee_name || "Unassigned"}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">Created</p>
+                    <p className="font-medium">{new Date(detailTicket.created_at).toLocaleDateString("en-IN", { dateStyle: "medium" })}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">Scheduled</p>
+                    <p className="font-medium">
+                      {detailTicket.scheduled_at
+                        ? new Date(detailTicket.scheduled_at).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })
+                        : "Not scheduled"}
+                    </p>
+                  </div>
+                </div>
+
+                {detailTicket.notes && (
+                  <div>
+                    <p className="text-xs text-muted-foreground">Notes</p>
+                    <p className="text-sm mt-0.5">{detailTicket.notes}</p>
+                  </div>
+                )}
+
+                <Separator />
+
+                <WhatsAppPanel ticket={detailTicket} />
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
