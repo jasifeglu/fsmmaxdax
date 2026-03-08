@@ -35,6 +35,7 @@ const UsersPage = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [newEmail, setNewEmail] = useState("");
   const [newName, setNewName] = useState("");
+  const [newPassword, setNewPassword] = useState("");
   const [newRole, setNewRole] = useState("technician");
 
   const fetchUsers = async () => {
@@ -53,19 +54,20 @@ const UsersPage = () => {
   useEffect(() => { fetchUsers(); }, []);
 
   const handleCreate = async () => {
-    if (!newEmail || !newName) return;
+    if (!newEmail || !newName || !newPassword) return;
     setCreating(true);
     const { data, error } = await supabase.functions.invoke("admin-users", {
-      body: { action: "create_user", email: newEmail, full_name: newName, role: newRole },
+      body: { action: "create_user", email: newEmail, full_name: newName, role: newRole, password: newPassword },
     });
     setCreating(false);
     if (error || data?.error) {
       toast({ title: "Error", description: data?.error || "Failed to create user", variant: "destructive" });
     } else {
-      toast({ title: "User created", description: `${newName} can now login via OTP` });
+      toast({ title: "User created", description: `${newName} can now login with email & password` });
       setDialogOpen(false);
       setNewEmail("");
       setNewName("");
+      setNewPassword("");
       setNewRole("technician");
       fetchUsers();
     }
@@ -107,7 +109,7 @@ const UsersPage = () => {
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Create New User</DialogTitle>
-              <DialogDescription>User will login via OTP email code</DialogDescription>
+              <DialogDescription>User will login with email and password</DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
               <div>
@@ -117,6 +119,10 @@ const UsersPage = () => {
               <div>
                 <Label className="text-xs">Email</Label>
                 <Input type="email" value={newEmail} onChange={(e) => setNewEmail(e.target.value)} placeholder="user@example.com" className="mt-1" />
+              </div>
+              <div>
+                <Label className="text-xs">Password</Label>
+                <Input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="Set a password" className="mt-1" />
               </div>
               <div>
                 <Label className="text-xs">Role</Label>
