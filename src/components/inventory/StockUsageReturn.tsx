@@ -19,7 +19,7 @@ interface Props {
 
 export const StockUsageReturn = ({ items, onRefresh }: Props) => {
   const { toast } = useToast();
-  const { userId } = useAuth();
+  const { user } = useAuth();
   const [transactions, setTransactions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [usageOpen, setUsageOpen] = useState(false);
