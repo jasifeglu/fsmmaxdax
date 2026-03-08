@@ -1,25 +1,25 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { PageHeader } from "@/components/PageHeader";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
 import {
-  User, Mail, Shield, Calendar, Edit, Save, Loader2, Lock,
+  User, Mail, Shield, Calendar, Edit, Save, Loader2, Lock, Camera,
 } from "lucide-react";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger,
 } from "@/components/ui/dialog";
 
-const roleLabels = { admin: "Administrator", coordinator: "Service Coordinator", technician: "Field Technician" };
+const roleLabels: Record<string, string> = { admin: "Administrator", coordinator: "Service Coordinator", technician: "Field Technician" };
 
 const ProfilePage = () => {
-  const { user, role, userName } = useAuth();
+  const { user, role, userName, avatarUrl, refreshProfile } = useAuth();
   const { toast } = useToast();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
@@ -28,6 +28,8 @@ const ProfilePage = () => {
   const [newPassword, setNewPassword] = useState("");
   const [changingPw, setChangingPw] = useState(false);
   const [pwDialogOpen, setPwDialogOpen] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (user) {
@@ -49,6 +51,7 @@ const ProfilePage = () => {
     } else {
       toast({ title: "Profile updated" });
       setEditOpen(false);
+      refreshProfile();
     }
   };
 
@@ -67,6 +70,52 @@ const ProfilePage = () => {
       setNewPassword("");
       setPwDialogOpen(false);
     }
+  };
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+
+    if (!file.type.startsWith("image/")) {
+      toast({ title: "Invalid file", description: "Please select an image file", variant: "destructive" });
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      toast({ title: "File too large", description: "Max 2MB allowed", variant: "destructive" });
+      return;
+    }
+
+    setUploading(true);
+    const ext = file.name.split(".").pop() || "jpg";
+    const path = `${user.id}/avatar.${ext}`;
+
+    // Upload (overwrite existing)
+    const { error: uploadError } = await supabase.storage
+      .from("uploads")
+      .upload(path, file, { upsert: true });
+
+    if (uploadError) {
+      toast({ title: "Upload failed", description: uploadError.message, variant: "destructive" });
+      setUploading(false);
+      return;
+    }
+
+    // Save path in profile
+    const { error: updateError } = await supabase
+      .from("profiles")
+      .update({ avatar_url: path, updated_at: new Date().toISOString() })
+      .eq("id", user.id);
+
+    setUploading(false);
+    if (updateError) {
+      toast({ title: "Error", description: updateError.message, variant: "destructive" });
+    } else {
+      toast({ title: "Profile picture updated" });
+      refreshProfile();
+    }
+
+    // Reset input
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   const initials = fullName ? fullName.split(" ").map(w => w[0]).join("").substring(0, 2).toUpperCase() : "U";
@@ -123,14 +172,36 @@ const ProfilePage = () => {
         <Card className="glass-card">
           <CardContent className="pt-6">
             <div className="flex items-center gap-4 mb-6">
-              <Avatar className="h-16 w-16 border-4 border-primary/20">
-                <AvatarFallback className="text-xl font-bold bg-primary/10 text-primary">
-                  {initials}
-                </AvatarFallback>
-              </Avatar>
+              <div className="relative group">
+                <Avatar className="h-16 w-16 border-4 border-primary/20">
+                  {avatarUrl && <AvatarImage src={avatarUrl} alt={fullName} />}
+                  <AvatarFallback className="text-xl font-bold bg-primary/10 text-primary">
+                    {initials}
+                  </AvatarFallback>
+                </Avatar>
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploading}
+                  className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                >
+                  {uploading ? (
+                    <Loader2 className="h-5 w-5 text-white animate-spin" />
+                  ) : (
+                    <Camera className="h-5 w-5 text-white" />
+                  )}
+                </button>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleAvatarUpload}
+                  className="hidden"
+                />
+              </div>
               <div>
                 <h2 className="text-lg font-bold text-foreground">{fullName || "User"}</h2>
                 <p className="text-sm text-muted-foreground">{roleLabels[role]}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">Hover avatar to change photo</p>
               </div>
             </div>
 

@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { User, Session } from "@supabase/supabase-js";
 
@@ -9,8 +9,10 @@ interface AuthContextType {
   session: Session | null;
   role: UserRole;
   userName: string;
+  avatarUrl: string | null;
   loading: boolean;
   signOut: () => Promise<void>;
+  refreshProfile: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -21,14 +23,23 @@ export const useAuth = () => {
   return ctx;
 };
 
+const getSignedAvatarUrl = async (path: string | null): Promise<string | null> => {
+  if (!path) return null;
+  // If it's already a full URL (legacy), return as-is
+  if (path.startsWith("http")) return path;
+  const { data } = await supabase.storage.from("uploads").createSignedUrl(path, 3600);
+  return data?.signedUrl || null;
+};
+
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [role, setRole] = useState<UserRole>("technician");
   const [userName, setUserName] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchUserData = async (userId: string) => {
+  const fetchUserData = useCallback(async (userId: string) => {
     // Fetch role
     const { data: roleData } = await supabase
       .from("user_roles")
@@ -43,34 +54,40 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // Fetch profile
     const { data: profile } = await supabase
       .from("profiles")
-      .select("full_name, email")
+      .select("full_name, email, avatar_url")
       .eq("id", userId)
       .single();
 
     if (profile) {
       setUserName(profile.full_name || profile.email || "User");
+      const signedUrl = await getSignedAvatarUrl(profile.avatar_url);
+      setAvatarUrl(signedUrl);
     }
-  };
+  }, []);
+
+  const refreshProfile = useCallback(() => {
+    if (user) {
+      fetchUserData(user.id);
+    }
+  }, [user, fetchUserData]);
 
   useEffect(() => {
-    // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
 
         if (session?.user) {
-          // Use setTimeout to avoid Supabase deadlock
           setTimeout(() => fetchUserData(session.user.id), 0);
         } else {
           setRole("technician");
           setUserName("");
+          setAvatarUrl(null);
         }
         setLoading(false);
       }
     );
 
-    // THEN check existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
@@ -81,14 +98,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [fetchUserData]);
 
   const signOut = async () => {
     await supabase.auth.signOut();
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, role, userName, loading, signOut }}>
+    <AuthContext.Provider value={{ user, session, role, userName, avatarUrl, loading, signOut, refreshProfile }}>
       {children}
     </AuthContext.Provider>
   );
