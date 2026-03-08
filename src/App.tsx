@@ -16,6 +16,9 @@ import ReportsPage from "./pages/ReportsPage";
 import UsersPage from "./pages/UsersPage";
 import SchedulePage from "./pages/SchedulePage";
 import SettingsPage from "./pages/SettingsPage";
+import ProfilePage from "./pages/ProfilePage";
+import PerformancePage from "./pages/PerformancePage";
+import UserMonitoringPage from "./pages/UserMonitoringPage";
 
 const queryClient = new QueryClient();
 
