@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { PageHeader } from "@/components/PageHeader";
 import { DashboardKPICards } from "@/components/dashboard/DashboardKPICards";
 import { DashboardCharts } from "@/components/dashboard/DashboardCharts";
@@ -7,42 +8,75 @@ import { FinancialOverviewPanel } from "@/components/dashboard/FinancialOverview
 import { InventoryAlertPanel } from "@/components/dashboard/InventoryAlertPanel";
 import { AlertsNotificationsPanel } from "@/components/dashboard/AlertsNotificationsPanel";
 import { QuickActions } from "@/components/dashboard/QuickActions";
-
-const kpiData = {
-  totalTicketsToday: 47,
-  activeJobs: 38,
-  pendingTickets: 24,
-  completedTickets: 85,
-  techniciansOnline: "12/18",
-  monthlyRevenue: "₹5.8L",
-  pendingPayments: "₹1.2L",
-  lowStockAlerts: 5,
-};
+import { supabase } from "@/integrations/supabase/client";
 
 export const AdminDashboard = () => {
+  const [tickets, setTickets] = useState<any[]>([]);
+  const [inventory, setInventory] = useState<any[]>([]);
+  const [invoices, setInvoices] = useState<any[]>([]);
+  const [profiles, setProfiles] = useState<any[]>([]);
+
+  const fetchAll = async () => {
+    const [tRes, iRes, invRes, pRes] = await Promise.all([
+      supabase.from("tickets").select("*").order("created_at", { ascending: false }),
+      supabase.from("inventory").select("*").order("name"),
+      supabase.from("invoices").select("*").order("created_at", { ascending: false }),
+      supabase.from("profiles").select("id, full_name"),
+    ]);
+    setTickets(tRes.data || []);
+    setInventory(iRes.data || []);
+    setInvoices(invRes.data || []);
+    setProfiles(pRes.data || []);
+  };
+
+  useEffect(() => {
+    fetchAll();
+    // Realtime refresh on ticket changes
+    const channel = supabase
+      .channel("dashboard-live")
+      .on("postgres_changes", { event: "*", schema: "public", table: "tickets" }, () => fetchAll())
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, []);
+
+  const today = new Date().toISOString().slice(0, 10);
+  const todayTickets = tickets.filter(t => t.created_at?.slice(0, 10) === today);
+  const activeJobs = tickets.filter(t => ["Assigned", "Scheduled", "On-Site", "Work-In-Progress"].includes(t.status));
+  const pendingTickets = tickets.filter(t => ["New", "Pending"].includes(t.status));
+  const completedTickets = tickets.filter(t => t.status === "Completed" || t.status === "Closed");
+  const lowStockItems = inventory.filter(i => i.status !== "OK");
+
+  const monthStart = new Date(); monthStart.setDate(1); monthStart.setHours(0, 0, 0, 0);
+  const monthlyInvoices = invoices.filter(inv => new Date(inv.created_at) >= monthStart);
+  const monthlyRevenue = monthlyInvoices.reduce((s, inv) => s + Number(inv.grand_total || 0), 0);
+  const pendingPayments = invoices.filter(inv => inv.payment_status === "Pending").reduce((s, inv) => s + Number(inv.grand_total || 0), 0);
+
+  const formatCurrency = (n: number) => n >= 100000 ? `₹${(n / 100000).toFixed(1)}L` : `₹${n.toLocaleString()}`;
+
+  const kpiData = {
+    totalTicketsToday: todayTickets.length,
+    activeJobs: activeJobs.length,
+    pendingTickets: pendingTickets.length,
+    completedTickets: completedTickets.length,
+    techniciansOnline: `${profiles.length}`,
+    monthlyRevenue: formatCurrency(monthlyRevenue),
+    pendingPayments: formatCurrency(pendingPayments),
+    lowStockAlerts: lowStockItems.length,
+  };
+
   return (
     <div>
-      <PageHeader title="Admin Dashboard" description="Command center — full operational overview" />
-
-      {/* Quick Actions */}
+      <PageHeader title="Admin Dashboard" description="Command center — live operational overview" />
       <QuickActions />
-
-      {/* KPI Summary Cards */}
       <DashboardKPICards data={kpiData} />
-
-      {/* Analytics & Graphs */}
-      <DashboardCharts />
-
-      {/* Technician Monitor + Live Tickets */}
+      <DashboardCharts tickets={tickets} invoices={invoices} inventory={inventory} />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
-        <TechnicianMonitorPanel />
-        <LiveTicketMonitor />
+        <TechnicianMonitorPanel tickets={tickets} profiles={profiles} />
+        <LiveTicketMonitor tickets={tickets} />
       </div>
-
-      {/* Financial + Inventory + Alerts */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
-        <FinancialOverviewPanel />
-        <InventoryAlertPanel />
+        <FinancialOverviewPanel invoices={invoices} />
+        <InventoryAlertPanel items={inventory} />
         <AlertsNotificationsPanel />
       </div>
     </div>
