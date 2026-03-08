@@ -2,7 +2,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 };
 
 Deno.serve(async (req) => {
@@ -27,15 +27,18 @@ Deno.serve(async (req) => {
       .select('role')
       .eq('user_id', caller.id)
       .single();
-    if (roleCheck?.role !== 'admin') throw new Error('Admin only');
+    if (roleCheck?.role !== 'admin') throw new Error('Unauthorized');
 
     const { action, ...payload } = await req.json();
 
     if (action === 'create_user') {
       const { email, full_name, role, password } = payload;
+      if (!email || !full_name || !password) throw new Error('Email, name and password are required');
+      if (password.length < 8) throw new Error('Password must be at least 8 characters');
+
       const { data: newUser, error } = await supabaseAdmin.auth.admin.createUser({
         email,
-        password: password || 'MaxDax@123',
+        password,
         email_confirm: true,
         user_metadata: { full_name },
       });
@@ -91,7 +94,16 @@ Deno.serve(async (req) => {
 
     throw new Error('Unknown action');
   } catch (error: any) {
-    return new Response(JSON.stringify({ error: error.message }), {
+    console.error('admin-users error:', error);
+    const safeMessages: Record<string, string> = {
+      'Unauthorized': 'Unauthorized',
+      'Email, name and password are required': 'Email, name and password are required',
+      'Password must be at least 8 characters': 'Password must be at least 8 characters',
+      'Unknown action': 'Unknown action',
+    };
+    const msg = safeMessages[error.message]
+      || (error.message?.includes('already registered') ? 'A user with this email already exists.' : 'An unexpected error occurred.');
+    return new Response(JSON.stringify({ error: msg }), {
       status: 400,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });

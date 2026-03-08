@@ -102,14 +102,12 @@ export const TechnicianDashboard = () => {
       return;
     }
 
-    const { data: urlData } = supabase.storage.from("uploads").getPublicUrl(path);
-
-    // Save check-in record
+    // Save check-in record (store the path, not a public URL)
     await supabase.from("selfie_checkins").insert({
       user_id: user.id,
       ticket_id: selfieTicketId,
       checkin_type: "check_in",
-      selfie_url: urlData.publicUrl,
+      selfie_url: path,
       latitude: lat,
       longitude: lng,
     });
