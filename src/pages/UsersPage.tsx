@@ -279,9 +279,9 @@ const UsersPage = () => {
                             </Select>
                           </td>
                           <td className="py-2.5">
-                            <div className="flex items-center gap-1">
-                              <Button variant="ghost" size="sm" className="text-xs h-7" onClick={() => openResetDialog(u)} title="Reset Password">
-                                <KeyRound className="h-3 w-3" />
+                            <div className="flex items-center gap-1.5">
+                              <Button variant="outline" size="sm" className="text-xs h-7 gap-1" onClick={() => openResetDialog(u)} title="Change Password">
+                                <KeyRound className="h-3 w-3" /> Change Password
                               </Button>
                               <Button variant="ghost" size="sm" className={`text-xs h-7 ${u.is_disabled ? 'text-emerald-600' : 'text-amber-600'}`} onClick={() => handleToggleDisable(u)} title={u.is_disabled ? "Enable Account" : "Disable Account"}>
                                 {u.is_disabled ? <CheckCircle className="h-3 w-3" /> : <Ban className="h-3 w-3" />}
