@@ -41,6 +41,57 @@ export type Database = {
         }
         Relationships: []
       }
+      audit_logs: {
+        Row: {
+          action: string
+          created_at: string
+          description: string
+          device_info: string | null
+          id: string
+          ip_address: string | null
+          module: string
+          new_value: string | null
+          previous_value: string | null
+          reason: string | null
+          record_id: string | null
+          user_id: string
+          user_name: string
+          user_role: string
+        }
+        Insert: {
+          action?: string
+          created_at?: string
+          description?: string
+          device_info?: string | null
+          id?: string
+          ip_address?: string | null
+          module?: string
+          new_value?: string | null
+          previous_value?: string | null
+          reason?: string | null
+          record_id?: string | null
+          user_id: string
+          user_name?: string
+          user_role?: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          description?: string
+          device_info?: string | null
+          id?: string
+          ip_address?: string | null
+          module?: string
+          new_value?: string | null
+          previous_value?: string | null
+          reason?: string | null
+          record_id?: string | null
+          user_id?: string
+          user_name?: string
+          user_role?: string
+        }
+        Relationships: []
+      }
       customers: {
         Row: {
           address: string | null
