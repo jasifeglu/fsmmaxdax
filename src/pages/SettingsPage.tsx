@@ -58,6 +58,7 @@ const SettingsPage = () => {
       case "integrations": return <IntegrationSettings settings={settings} update={update} />;
       case "appearance": return <AppearanceSettings settings={settings} update={update} />;
       case "data": return <DataSettings settings={settings} update={update} />;
+      case "mockdata": return <MockDataSettings settings={settings} update={update} />;
       default: return null;
     }
   };
