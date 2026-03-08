@@ -77,6 +77,59 @@ export type Database = {
         }
         Relationships: []
       }
+      devices: {
+        Row: {
+          brand: string
+          created_at: string
+          customer_id: string | null
+          device_name: string
+          eid: string | null
+          id: string
+          installation_date: string | null
+          model: string
+          notes: string | null
+          serial_number: string | null
+          updated_at: string
+          warranty_status: string
+        }
+        Insert: {
+          brand?: string
+          created_at?: string
+          customer_id?: string | null
+          device_name?: string
+          eid?: string | null
+          id?: string
+          installation_date?: string | null
+          model?: string
+          notes?: string | null
+          serial_number?: string | null
+          updated_at?: string
+          warranty_status?: string
+        }
+        Update: {
+          brand?: string
+          created_at?: string
+          customer_id?: string | null
+          device_name?: string
+          eid?: string | null
+          id?: string
+          installation_date?: string | null
+          model?: string
+          notes?: string | null
+          serial_number?: string | null
+          updated_at?: string
+          warranty_status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "devices_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       distance_charge_rules: {
         Row: {
           base_fee: number
@@ -726,87 +779,250 @@ export type Database = {
         }
         Relationships: []
       }
+      ticket_technicians: {
+        Row: {
+          assignment_type: string
+          checkin_time: string | null
+          checkout_time: string | null
+          created_at: string
+          customer_signature_url: string | null
+          id: string
+          notes: string | null
+          photos: string[] | null
+          role: string
+          sequence_order: number
+          ticket_id: string
+          updated_at: string
+          user_id: string
+          work_performed: string | null
+        }
+        Insert: {
+          assignment_type?: string
+          checkin_time?: string | null
+          checkout_time?: string | null
+          created_at?: string
+          customer_signature_url?: string | null
+          id?: string
+          notes?: string | null
+          photos?: string[] | null
+          role?: string
+          sequence_order?: number
+          ticket_id: string
+          updated_at?: string
+          user_id: string
+          work_performed?: string | null
+        }
+        Update: {
+          assignment_type?: string
+          checkin_time?: string | null
+          checkout_time?: string | null
+          created_at?: string
+          customer_signature_url?: string | null
+          id?: string
+          notes?: string | null
+          photos?: string[] | null
+          role?: string
+          sequence_order?: number
+          ticket_id?: string
+          updated_at?: string
+          user_id?: string
+          work_performed?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ticket_technicians_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ticket_timeline: {
+        Row: {
+          action: string
+          created_at: string
+          description: string
+          id: string
+          metadata: Json | null
+          ticket_id: string
+          user_id: string
+          user_name: string
+        }
+        Insert: {
+          action?: string
+          created_at?: string
+          description?: string
+          id?: string
+          metadata?: Json | null
+          ticket_id: string
+          user_id: string
+          user_name?: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          description?: string
+          id?: string
+          metadata?: Json | null
+          ticket_id?: string
+          user_id?: string
+          user_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ticket_timeline_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tickets: {
         Row: {
+          additional_service_charge: number | null
           assigned_to: string | null
           assignee_name: string | null
           category: string
+          company_margin_pct: number | null
+          complaint_description: string | null
           completed_at: string | null
           created_at: string
           created_by: string | null
           customer_address: string | null
+          customer_explanation: string | null
           customer_id: string | null
           customer_latitude: number | null
           customer_longitude: number | null
           customer_name: string
           customer_phone: string
+          delay_category: string | null
+          delay_reason: string | null
+          device_id: string | null
           distance_charge: number | null
           distance_km: number | null
+          final_customer_amount: number | null
           id: string
           issue: string
           notes: string | null
+          pickup_date: string | null
           priority: string
           product_id: string | null
+          product_returned_date: string | null
           scheduled_at: string | null
+          sent_to_vendor_date: string | null
           service_charge: number | null
           sla_hours: number | null
           status: string
+          technician_observations: string | null
           ticket_number: string
           updated_at: string
+          vendor_completion_date: string | null
+          vendor_expected_completion: string | null
+          vendor_id: string | null
+          vendor_invoice_amount: number | null
+          vendor_invoice_url: string | null
+          vendor_registration_date: string | null
+          vendor_service_notes: string | null
+          vendor_srn: string | null
+          vendor_ticket_number: string | null
         }
         Insert: {
+          additional_service_charge?: number | null
           assigned_to?: string | null
           assignee_name?: string | null
           category?: string
+          company_margin_pct?: number | null
+          complaint_description?: string | null
           completed_at?: string | null
           created_at?: string
           created_by?: string | null
           customer_address?: string | null
+          customer_explanation?: string | null
           customer_id?: string | null
           customer_latitude?: number | null
           customer_longitude?: number | null
           customer_name?: string
           customer_phone?: string
+          delay_category?: string | null
+          delay_reason?: string | null
+          device_id?: string | null
           distance_charge?: number | null
           distance_km?: number | null
+          final_customer_amount?: number | null
           id?: string
           issue: string
           notes?: string | null
+          pickup_date?: string | null
           priority?: string
           product_id?: string | null
+          product_returned_date?: string | null
           scheduled_at?: string | null
+          sent_to_vendor_date?: string | null
           service_charge?: number | null
           sla_hours?: number | null
           status?: string
+          technician_observations?: string | null
           ticket_number: string
           updated_at?: string
+          vendor_completion_date?: string | null
+          vendor_expected_completion?: string | null
+          vendor_id?: string | null
+          vendor_invoice_amount?: number | null
+          vendor_invoice_url?: string | null
+          vendor_registration_date?: string | null
+          vendor_service_notes?: string | null
+          vendor_srn?: string | null
+          vendor_ticket_number?: string | null
         }
         Update: {
+          additional_service_charge?: number | null
           assigned_to?: string | null
           assignee_name?: string | null
           category?: string
+          company_margin_pct?: number | null
+          complaint_description?: string | null
           completed_at?: string | null
           created_at?: string
           created_by?: string | null
           customer_address?: string | null
+          customer_explanation?: string | null
           customer_id?: string | null
           customer_latitude?: number | null
           customer_longitude?: number | null
           customer_name?: string
           customer_phone?: string
+          delay_category?: string | null
+          delay_reason?: string | null
+          device_id?: string | null
           distance_charge?: number | null
           distance_km?: number | null
+          final_customer_amount?: number | null
           id?: string
           issue?: string
           notes?: string | null
+          pickup_date?: string | null
           priority?: string
           product_id?: string | null
+          product_returned_date?: string | null
           scheduled_at?: string | null
+          sent_to_vendor_date?: string | null
           service_charge?: number | null
           sla_hours?: number | null
           status?: string
+          technician_observations?: string | null
           ticket_number?: string
           updated_at?: string
+          vendor_completion_date?: string | null
+          vendor_expected_completion?: string | null
+          vendor_id?: string | null
+          vendor_invoice_amount?: number | null
+          vendor_invoice_url?: string | null
+          vendor_registration_date?: string | null
+          vendor_service_notes?: string | null
+          vendor_srn?: string | null
+          vendor_ticket_number?: string | null
         }
         Relationships: [
           {
@@ -817,10 +1033,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "tickets_device_id_fkey"
+            columns: ["device_id"]
+            isOneToOne: false
+            referencedRelation: "devices"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "tickets_product_id_fkey"
             columns: ["product_id"]
             isOneToOne: false
             referencedRelation: "product_catalog"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tickets_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
             referencedColumns: ["id"]
           },
         ]
@@ -893,6 +1123,45 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      vendors: {
+        Row: {
+          address: string | null
+          contact_person: string | null
+          created_at: string
+          email: string | null
+          id: string
+          is_active: boolean
+          name: string
+          phone: string | null
+          service_categories: string | null
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          contact_person?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          phone?: string | null
+          service_categories?: string | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          contact_person?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          phone?: string | null
+          service_categories?: string | null
+          updated_at?: string
         }
         Relationships: []
       }
