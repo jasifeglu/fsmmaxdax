@@ -9,6 +9,7 @@ import { StockIssuance } from "@/components/inventory/StockIssuance";
 import { StockUsageReturn } from "@/components/inventory/StockUsageReturn";
 import { PurchaseRequests } from "@/components/inventory/PurchaseRequests";
 import { InventoryReports } from "@/components/inventory/InventoryReports";
+import { formatINR } from "@/lib/formatINR";
 
 const InventoryPage = () => {
   const [items, setItems] = useState<any[]>([]);
