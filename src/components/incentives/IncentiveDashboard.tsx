@@ -5,6 +5,7 @@ import {
   Trophy, Target, Star, Zap, Clock, DollarSign, TrendingUp, Award,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { formatINR } from "@/lib/formatINR";
 
 // Mock data for current technician
 const performanceData = {
