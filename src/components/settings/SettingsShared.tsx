@@ -25,14 +25,32 @@ export const useSettings = () => {
   }, []);
 
   const update = useCallback(async (key: string, value: string) => {
+    const previousValue = settings[key] || "";
     setSettings(prev => ({ ...prev, [key]: value }));
     const { error } = await supabase
       .from("app_settings")
       .upsert({ key, value, updated_at: new Date().toISOString() }, { onConflict: "key" });
     if (error) {
       toast({ title: "Error saving", description: error.message, variant: "destructive" });
+    } else {
+      // Log settings change to audit trail
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        await supabase.from("audit_logs").insert({
+          user_id: user.id,
+          user_name: user.user_metadata?.full_name || user.email || "",
+          user_role: "",
+          action: "settings_change",
+          module: "Settings",
+          description: `Changed setting "${key}"`,
+          record_id: key,
+          previous_value: previousValue,
+          new_value: value,
+          device_info: navigator.userAgent.slice(0, 120),
+        });
+      }
     }
-  }, [toast]);
+  }, [toast, settings]);
 
   return { settings, loading, update };
 };
