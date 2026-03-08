@@ -25,6 +25,7 @@ import PerformancePage from "./pages/PerformancePage";
 import UserMonitoringPage from "./pages/UserMonitoringPage";
 import TravelExpensesPage from "./pages/TravelExpensesPage";
 import IncentivesPage from "./pages/IncentivesPage";
+import AuditLogsPage from "./pages/AuditLogsPage";
 import { Loader2 } from "lucide-react";
 import type { UserRole } from "@/contexts/AuthContext";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
