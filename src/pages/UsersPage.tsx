@@ -109,7 +109,7 @@ const UsersPage = () => {
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Create New User</DialogTitle>
-              <DialogDescription>User will login via OTP email code</DialogDescription>
+              <DialogDescription>User will login with email and password</DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
               <div>
