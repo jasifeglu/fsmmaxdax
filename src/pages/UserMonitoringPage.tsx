@@ -9,7 +9,7 @@ import { StatCard } from "@/components/StatCard";
 import { motion } from "framer-motion";
 import {
   Users, Search, Download, Eye, BarChart3, Ticket,
-  CheckCircle2, Clock, Star, TrendingUp, DollarSign, Target,
+  CheckCircle2, Clock, Star, TrendingUp, DollarSign, Target, FileText,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
