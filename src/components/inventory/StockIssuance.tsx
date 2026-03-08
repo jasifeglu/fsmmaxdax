@@ -17,7 +17,7 @@ interface Props {
 
 export const StockIssuance = ({ items, onRefresh }: Props) => {
   const { toast } = useToast();
-  const { userId } = useAuth();
+  const { user } = useAuth();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [issuing, setIssuing] = useState(false);
   const [technicians, setTechnicians] = useState<any[]>([]);
