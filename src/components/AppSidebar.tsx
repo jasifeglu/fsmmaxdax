@@ -29,6 +29,7 @@ const navItems: NavItem[] = [
   { title: "My Jobs", url: "/my-jobs", icon: ClipboardList, roles: ["technician"] },
   { title: "Inventory", url: "/inventory", icon: Package, roles: ["admin"] },
   { title: "Billing", url: "/billing", icon: DollarSign, roles: ["admin", "technician"] },
+  { title: "Travel Expenses", url: "/travel-expenses", icon: Car, roles: ["admin", "technician"] },
   { title: "Reports", url: "/reports", icon: BarChart3, roles: ["admin"] },
   { title: "My Profile", url: "/profile", icon: User, roles: ["admin", "coordinator", "technician"] },
   { title: "My Performance", url: "/performance", icon: TrendingUp, roles: ["admin", "coordinator", "technician"] },
