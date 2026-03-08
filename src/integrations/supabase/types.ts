@@ -502,6 +502,39 @@ export type Database = {
         }
         Relationships: []
       }
+      password_reset_logs: {
+        Row: {
+          action: string
+          admin_id: string
+          admin_name: string
+          created_at: string
+          id: string
+          reason: string | null
+          target_user_id: string
+          target_user_name: string
+        }
+        Insert: {
+          action?: string
+          admin_id: string
+          admin_name?: string
+          created_at?: string
+          id?: string
+          reason?: string | null
+          target_user_id: string
+          target_user_name?: string
+        }
+        Update: {
+          action?: string
+          admin_id?: string
+          admin_name?: string
+          created_at?: string
+          id?: string
+          reason?: string | null
+          target_user_id?: string
+          target_user_name?: string
+        }
+        Relationships: []
+      }
       product_catalog: {
         Row: {
           brand: string
