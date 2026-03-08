@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { exportCSV, exportPDF } from "@/lib/exportUtils";
 import { PageHeader } from "@/components/PageHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,7 +9,7 @@ import { StatCard } from "@/components/StatCard";
 import { motion } from "framer-motion";
 import {
   Users, Search, Download, Eye, BarChart3, Ticket,
-  CheckCircle2, Clock, Star, TrendingUp, DollarSign, Target,
+  CheckCircle2, Clock, Star, TrendingUp, DollarSign, Target, FileText,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
@@ -73,13 +74,26 @@ const UserMonitoringPage = () => {
     const matchSearch = u.name.toLowerCase().includes(search.toLowerCase());
     return matchRole && matchSearch;
   });
+  const monitorHeaders = ["Name", "Role", "Status", "Tickets", "Completed", "Efficiency", "Rating", "Branch"];
+  const monitorRows = filtered.map((u) => [u.name, u.role, u.status, u.tickets, u.completed, `${u.efficiency}%`, u.rating, u.branch]);
+  const monitorSummary = [
+    { label: "Total Staff", value: allUsers.length },
+    { label: "Avg Efficiency", value: "87%" },
+    { label: "Avg Rating", value: "4.4/5" },
+    { label: "Total Revenue", value: "₹10.2L" },
+  ];
 
   return (
     <div>
       <PageHeader title="User Monitoring" description="View performance and activity of all team members">
-        <Button size="sm" variant="outline" className="gap-1.5 text-xs">
-          <Download className="h-3.5 w-3.5" /> Export Report
-        </Button>
+        <div className="flex gap-2">
+          <Button size="sm" variant="outline" className="gap-1.5 text-xs" onClick={() => exportCSV("user-monitoring", monitorHeaders, monitorRows)}>
+            <Download className="h-3.5 w-3.5" /> CSV
+          </Button>
+          <Button size="sm" className="bg-primary text-primary-foreground gap-1.5 text-xs" onClick={() => exportPDF("User Monitoring Report", "user-monitoring-report", monitorHeaders, monitorRows, monitorSummary)}>
+            <FileText className="h-3.5 w-3.5" /> PDF
+          </Button>
+        </div>
       </PageHeader>
 
       {/* Summary stats */}

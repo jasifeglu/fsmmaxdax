@@ -1,5 +1,8 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { PageHeader } from "@/components/PageHeader";
+import { Button } from "@/components/ui/button";
+import { Download, FileText } from "lucide-react";
+import { exportCSV, exportPDF } from "@/lib/exportUtils";
 import { StatCard } from "@/components/StatCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { motion } from "framer-motion";
@@ -263,8 +266,54 @@ const AdminPerformance = () => (
   </>
 );
 
+const getExportData = (role: string) => {
+  if (role === "technician") {
+    return {
+      summary: [
+        { label: "Assigned Tickets", value: 432 }, { label: "Completed Jobs", value: 398 },
+        { label: "Pending Jobs", value: 22 }, { label: "First-Fix Rate", value: "82%" },
+        { label: "Avg Service Time", value: "1.4 hrs" }, { label: "Revenue Generated", value: "₹3.02L" },
+        { label: "Customer Rating", value: "4.6/5" },
+      ],
+      headers: ["Month", "Completed", "Pending"],
+      rows: techMonthlyData.map((d) => [d.month, d.completed, d.pending]),
+    };
+  }
+  if (role === "coordinator") {
+    return {
+      summary: [
+        { label: "Tickets Created", value: 298 }, { label: "Resolved Cases", value: 265 },
+        { label: "Escalated Cases", value: 12 }, { label: "SLA Compliance", value: "91%" },
+        { label: "Avg Scheduling Time", value: "28 min" }, { label: "Satisfaction Score", value: "4.5/5" },
+      ],
+      headers: ["Month", "Created", "Resolved"],
+      rows: coordTicketTrend.map((d) => [d.month, d.created, d.resolved]),
+    };
+  }
+  return {
+    summary: [
+      { label: "Total Tickets Managed", value: 1240 }, { label: "Total Revenue", value: "₹64.2L" },
+      { label: "Technicians Supervised", value: 18 }, { label: "Service Quality Index", value: "4.7/5" },
+      { label: "Team Productivity", value: "87%" }, { label: "Revenue Growth Rate", value: "+18%" },
+    ],
+    headers: ["Month", "Tickets", "Revenue (₹)"],
+    rows: adminGrowthData.map((d) => [d.month, d.tickets, d.revenue]),
+  };
+};
+
+const roleTitle = { admin: "Admin", coordinator: "Coordinator", technician: "Technician" };
+
 const PerformancePage = () => {
   const { role } = useAuth();
+  const data = getExportData(role);
+
+  const handleExportPDF = () => {
+    exportPDF(`${roleTitle[role]} Performance Report`, `${role}-performance-report`, data.headers, data.rows, data.summary);
+  };
+
+  const handleExportCSV = () => {
+    exportCSV(`${role}-performance-data`, data.headers, data.rows);
+  };
 
   return (
     <div>
@@ -275,7 +324,16 @@ const PerformancePage = () => {
           role === "coordinator" ? "Your coordination efficiency and KPIs" :
           "System oversight and management KPIs"
         }
-      />
+      >
+        <div className="flex gap-2">
+          <Button size="sm" variant="outline" className="gap-1.5 text-xs" onClick={handleExportCSV}>
+            <Download className="h-3.5 w-3.5" /> CSV
+          </Button>
+          <Button size="sm" className="bg-primary text-primary-foreground gap-1.5 text-xs" onClick={handleExportPDF}>
+            <FileText className="h-3.5 w-3.5" /> PDF
+          </Button>
+        </div>
+      </PageHeader>
       {role === "technician" && <TechnicianPerformance />}
       {role === "coordinator" && <CoordinatorPerformance />}
       {role === "admin" && <AdminPerformance />}
