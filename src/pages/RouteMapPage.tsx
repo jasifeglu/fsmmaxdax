@@ -21,13 +21,19 @@ L.Icon.Default.mergeOptions({
 const techIcon = new L.Icon({
   iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png",
   shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
-  iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41],
+  iconSize: [25, 41] as L.PointExpression,
+  iconAnchor: [12, 41] as L.PointExpression,
+  popupAnchor: [1, -34] as L.PointExpression,
+  shadowSize: [41, 41] as L.PointExpression,
 });
 
 const jobIcon = new L.Icon({
   iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png",
   shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
-  iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41],
+  iconSize: [25, 41] as L.PointExpression,
+  iconAnchor: [12, 41] as L.PointExpression,
+  popupAnchor: [1, -34] as L.PointExpression,
+  shadowSize: [41, 41] as L.PointExpression,
 });
 
 const haversine = (lat1: number, lon1: number, lat2: number, lon2: number) => {
@@ -54,7 +60,7 @@ const RouteMapPage = () => {
       ]);
 
       const skills = skillsRes.data || [];
-      const techs = (techRes.data || []).map(t => {
+      const techs = (techRes.data || []).map((t: any) => {
         const skill = skills.find((s: any) => s.user_id === t.id);
         return { ...t, ...skill };
       });
@@ -67,18 +73,17 @@ const RouteMapPage = () => {
   }, []);
 
   const activeTickets = useMemo(() => {
-    if (selectedTech === "all") return tickets.filter(t => t.customer_latitude && t.customer_longitude);
-    return tickets.filter(t => t.assigned_to === selectedTech && t.customer_latitude && t.customer_longitude);
+    if (selectedTech === "all") return tickets.filter((t: any) => t.customer_latitude && t.customer_longitude);
+    return tickets.filter((t: any) => t.assigned_to === selectedTech && t.customer_latitude && t.customer_longitude);
   }, [tickets, selectedTech]);
 
-  const selectedTechData = technicians.find(t => t.id === selectedTech);
+  const selectedTechData = technicians.find((t: any) => t.id === selectedTech);
 
-  const routePoints = useMemo(() => {
+  const routePoints = useMemo((): L.LatLngExpression[] => {
     if (!selectedTechData?.home_latitude) return [];
     const home: [number, number] = [Number(selectedTechData.home_latitude), Number(selectedTechData.home_longitude)];
-    const jobs = activeTickets.map(t => [Number(t.customer_latitude), Number(t.customer_longitude)] as [number, number]);
-    
-    // Simple nearest-neighbor route optimization
+    const jobs = activeTickets.map((t: any) => [Number(t.customer_latitude), Number(t.customer_longitude)] as [number, number]);
+
     if (jobs.length === 0) return [];
     const ordered: [number, number][] = [home];
     const remaining = [...jobs];
@@ -100,16 +105,18 @@ const RouteMapPage = () => {
   const totalDistance = useMemo(() => {
     let d = 0;
     for (let i = 1; i < routePoints.length; i++) {
-      d += haversine(routePoints[i - 1][0], routePoints[i - 1][1], routePoints[i][0], routePoints[i][1]);
+      const p1 = routePoints[i - 1] as [number, number];
+      const p2 = routePoints[i] as [number, number];
+      d += haversine(p1[0], p1[1], p2[0], p2[1]);
     }
     return d;
   }, [routePoints]);
 
-  const center: [number, number] = routePoints.length > 0
+  const center: L.LatLngExpression = routePoints.length > 0
     ? routePoints[0]
     : activeTickets.length > 0
       ? [Number(activeTickets[0].customer_latitude), Number(activeTickets[0].customer_longitude)]
-      : [19.076, 72.8777]; // Mumbai default
+      : [19.076, 72.8777];
 
   return (
     <div>
@@ -124,7 +131,7 @@ const RouteMapPage = () => {
                   <SelectTrigger className="w-56 h-9 text-sm"><SelectValue placeholder="Select technician" /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Technicians</SelectItem>
-                    {technicians.map(t => <SelectItem key={t.id} value={t.id}>{t.full_name}</SelectItem>)}
+                    {technicians.map((t: any) => <SelectItem key={t.id} value={t.id}>{t.full_name}</SelectItem>)}
                   </SelectContent>
                 </Select>
                 {routePoints.length > 0 && (
@@ -141,20 +148,18 @@ const RouteMapPage = () => {
                 <div className="flex justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
               ) : (
                 <div className="rounded-lg overflow-hidden border border-border" style={{ height: 500 }}>
-                  <MapContainer center={center} zoom={12} style={{ height: "100%", width: "100%" }} scrollWheelZoom>
-                    <TileLayer
-                      attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    />
-                    {/* Technician home markers */}
-                    {technicians.filter(t => t.home_latitude && (selectedTech === "all" || t.id === selectedTech)).map(t => (
-                      <Marker key={`tech-${t.id}`} position={[Number(t.home_latitude), Number(t.home_longitude)]} icon={techIcon}>
+                  <MapContainer {...{ center, zoom: 12, style: { height: "100%", width: "100%" }, scrollWheelZoom: true } as any}>
+                    <TileLayer {...{
+                      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+                      url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    } as any} />
+                    {technicians.filter((t: any) => t.home_latitude && (selectedTech === "all" || t.id === selectedTech)).map((t: any) => (
+                      <Marker key={`tech-${t.id}`} {...{ position: [Number(t.home_latitude), Number(t.home_longitude)] as L.LatLngExpression, icon: techIcon } as any}>
                         <Popup><strong>{t.full_name}</strong><br />Home Base</Popup>
                       </Marker>
                     ))}
-                    {/* Job location markers */}
-                    {activeTickets.map((t, i) => (
-                      <Marker key={t.id} position={[Number(t.customer_latitude), Number(t.customer_longitude)]} icon={jobIcon}>
+                    {activeTickets.map((t: any) => (
+                      <Marker key={t.id} {...{ position: [Number(t.customer_latitude), Number(t.customer_longitude)] as L.LatLngExpression, icon: jobIcon } as any}>
                         <Popup>
                           <strong>{t.ticket_number}</strong><br />
                           {t.customer_name}<br />
@@ -165,9 +170,8 @@ const RouteMapPage = () => {
                         </Popup>
                       </Marker>
                     ))}
-                    {/* Route polyline */}
                     {routePoints.length > 1 && (
-                      <Polyline positions={routePoints} pathOptions={{ color: "hsl(var(--primary))", weight: 3, dashArray: "10 6" }} />
+                      <Polyline positions={routePoints} pathOptions={{ color: "#3b82f6", weight: 3, dashArray: "10 6" }} />
                     )}
                   </MapContainer>
                 </div>
@@ -176,7 +180,6 @@ const RouteMapPage = () => {
           </Card>
         </div>
 
-        {/* Sidebar: Route sequence */}
         <div>
           <Card className="glass-card">
             <CardHeader className="pb-2">
@@ -198,7 +201,7 @@ const RouteMapPage = () => {
                       </div>
                     </div>
                   )}
-                  {activeTickets.map((t, i) => {
+                  {activeTickets.map((t: any, i: number) => {
                     const prev = i === 0 && selectedTechData?.home_latitude
                       ? { lat: Number(selectedTechData.home_latitude), lng: Number(selectedTechData.home_longitude) }
                       : i > 0 ? { lat: Number(activeTickets[i - 1].customer_latitude), lng: Number(activeTickets[i - 1].customer_longitude) } : null;
@@ -232,17 +235,16 @@ const RouteMapPage = () => {
             </CardContent>
           </Card>
 
-          {/* Distance charge preview */}
           <Card className="glass-card mt-4">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium">Distance Charges</CardTitle>
             </CardHeader>
             <CardContent>
-              {activeTickets.filter(t => t.distance_km).length === 0 ? (
+              {activeTickets.filter((t: any) => t.distance_km).length === 0 ? (
                 <p className="text-xs text-muted-foreground">No distance charges calculated yet.</p>
               ) : (
                 <div className="space-y-1.5">
-                  {activeTickets.filter(t => t.distance_km).map(t => (
+                  {activeTickets.filter((t: any) => t.distance_km).map((t: any) => (
                     <div key={t.id} className="flex justify-between text-xs">
                       <span className="font-mono text-muted-foreground">{t.ticket_number}</span>
                       <span>{Number(t.distance_km).toFixed(1)} km → <strong>₹{Number(t.distance_charge).toLocaleString()}</strong></span>
