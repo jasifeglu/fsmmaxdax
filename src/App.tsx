@@ -84,41 +84,7 @@ const RoleGuard = ({ allowed, children }: { allowed: UserRole[]; children: React
   return <>{children}</>;
 };
 
-const ProtectedRoutes = () => {
-  const { user, loading } = useAuth();
-
-  if (loading) return <PageLoader />;
-  if (!user) return <Navigate to="/auth" replace />;
-
-  return (
-    <AppLayout>
-      <Suspense fallback={<PageLoader />}>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/tickets" element={<RoleGuard allowed={["admin", "coordinator"]}><TicketsPage /></RoleGuard>} />
-          <Route path="/schedule" element={<RoleGuard allowed={["admin", "coordinator"]}><SchedulePage /></RoleGuard>} />
-          <Route path="/route-map" element={<RoleGuard allowed={["admin", "coordinator", "technician"]}><RouteMapPage /></RoleGuard>} />
-          <Route path="/product-catalog" element={<RoleGuard allowed={["admin"]}><ProductCatalogPage /></RoleGuard>} />
-          <Route path="/customers" element={<RoleGuard allowed={["admin", "coordinator"]}><CustomersPage /></RoleGuard>} />
-          <Route path="/technicians" element={<RoleGuard allowed={["admin", "coordinator"]}><TechniciansPage /></RoleGuard>} />
-          <Route path="/my-jobs" element={<RoleGuard allowed={["technician"]}><Index /></RoleGuard>} />
-          <Route path="/inventory" element={<RoleGuard allowed={["admin"]}><InventoryPage /></RoleGuard>} />
-          <Route path="/billing" element={<RoleGuard allowed={["admin", "technician"]}><BillingPage /></RoleGuard>} />
-          <Route path="/travel-expenses" element={<RoleGuard allowed={["admin", "technician"]}><TravelExpensesPage /></RoleGuard>} />
-          <Route path="/reports" element={<RoleGuard allowed={["admin"]}><ReportsPage /></RoleGuard>} />
-          <Route path="/incentives" element={<RoleGuard allowed={["admin", "technician"]}><IncentivesPage /></RoleGuard>} />
-          <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/performance" element={<PerformancePage />} />
-          <Route path="/user-monitoring" element={<RoleGuard allowed={["admin", "coordinator"]}><UserMonitoringPage /></RoleGuard>} />
-          <Route path="/users" element={<RoleGuard allowed={["admin"]}><UsersPage /></RoleGuard>} />
-          <Route path="/audit-logs" element={<RoleGuard allowed={["admin"]}><AuditLogsPage /></RoleGuard>} />
-          <Route path="/settings" element={<RoleGuard allowed={["admin"]}><SettingsPage /></RoleGuard>} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </Suspense>
-    </AppLayout>
-  );
-};
+// Removed duplicate - using AppRoutes above
 
 const PublicRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
