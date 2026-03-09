@@ -18,16 +18,21 @@ export const AdminDashboard = () => {
   const [profiles, setProfiles] = useState<any[]>([]);
 
   const fetchAll = async () => {
-    const [tRes, iRes, invRes, pRes] = await Promise.all([
+    const [tRes, iRes, invRes, pRes, rRes] = await Promise.all([
       supabase.from("tickets").select("*").order("created_at", { ascending: false }),
       supabase.from("inventory").select("*").order("name"),
       supabase.from("invoices").select("*").order("created_at", { ascending: false }),
       supabase.from("profiles").select("id, full_name"),
+      supabase.from("user_roles").select("user_id, role"),
     ]);
     setTickets(tRes.data || []);
     setInventory(iRes.data || []);
     setInvoices(invRes.data || []);
-    setProfiles(pRes.data || []);
+    // Only include technician profiles
+    const roles = rRes.data || [];
+    const techIds = roles.filter(r => r.role === "technician").map(r => r.user_id);
+    const techProfiles = (pRes.data || []).filter(p => techIds.includes(p.id));
+    setProfiles(techProfiles);
   };
 
   useEffect(() => {
