@@ -31,7 +31,10 @@ const CustomersPage = () => {
   useEffect(() => { fetchCustomers(); }, []);
 
   const handleCreate = async () => {
-    if (!form.name || !form.phone) return;
+    if (!form.name || !form.phone) {
+      toast({ title: "Please fill required fields", description: "Customer name and phone are required", variant: "destructive" });
+      return;
+    }
     setCreating(true);
     const { error } = await supabase.from("customers").insert(form);
     setCreating(false);

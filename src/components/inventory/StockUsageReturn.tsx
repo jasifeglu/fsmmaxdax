@@ -43,7 +43,10 @@ export const StockUsageReturn = ({ items, onRefresh }: Props) => {
   useEffect(() => { fetchData(); }, []);
 
   const handleUsage = async () => {
-    if (!usageForm.inventory_id || usageForm.quantity <= 0) return;
+    if (!usageForm.inventory_id || usageForm.quantity <= 0) {
+      toast({ title: "Please fill required fields", description: "Select an item and enter a valid quantity", variant: "destructive" });
+      return;
+    }
     const item = items.find(i => i.id === usageForm.inventory_id);
     if (!item || item.van_stock < usageForm.quantity) {
       toast({ title: "Insufficient van stock", variant: "destructive" });
@@ -72,9 +75,15 @@ export const StockUsageReturn = ({ items, onRefresh }: Props) => {
   };
 
   const handleReturn = async () => {
-    if (!returnForm.inventory_id || returnForm.quantity <= 0) return;
+    if (!returnForm.inventory_id || returnForm.quantity <= 0) {
+      toast({ title: "Please fill required fields", description: "Select an item and enter a valid quantity", variant: "destructive" });
+      return;
+    }
     const item = items.find(i => i.id === returnForm.inventory_id);
-    if (!item) return;
+    if (!item) {
+      toast({ title: "Item not found", variant: "destructive" });
+      return;
+    }
     setSubmitting(true);
     await supabase.from("inventory_transactions").insert({
       inventory_id: returnForm.inventory_id,
