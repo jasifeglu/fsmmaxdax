@@ -230,6 +230,15 @@ const TicketsPage = () => {
                   </Select>
                 </div>
               </div>
+              <div>
+                <Label className="text-xs">Assign Technician</Label>
+                <Select value={form.assigned_to} onValueChange={(v) => setForm({ ...form, assigned_to: v })}>
+                  <SelectTrigger className="mt-1"><SelectValue placeholder="Unassigned (optional)" /></SelectTrigger>
+                  <SelectContent>
+                    {technicians.map(t => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
               <Button onClick={handleCreate} disabled={creating} className="w-full">
                 {creating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Create Ticket
               </Button>

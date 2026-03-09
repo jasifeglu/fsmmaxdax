@@ -47,7 +47,10 @@ const TravelExpensesPage = () => {
   useEffect(() => { fetchExpenses(); }, []);
 
   const handleCreate = async () => {
-    if (!form.amount) return;
+    if (!form.amount || form.amount <= 0) {
+      toast({ title: "Validation Error", description: "Please enter a valid amount", variant: "destructive" });
+      return;
+    }
     setCreating(true);
     const { error } = await supabase.from("travel_expenses").insert({
       ...form,
