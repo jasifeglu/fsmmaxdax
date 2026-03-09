@@ -72,7 +72,14 @@ const TicketsPage = () => {
   const generateTicketNumber = () => `MXD-${Math.floor(100000 + Math.random() * 900000)}`;
 
   const handleCreate = async () => {
-    if (!form.customer_name || !form.issue) return;
+    if (!form.customer_name.trim()) {
+      toast({ title: "Validation Error", description: "Customer name is required", variant: "destructive" });
+      return;
+    }
+    if (!form.issue.trim()) {
+      toast({ title: "Validation Error", description: "Issue summary is required", variant: "destructive" });
+      return;
+    }
     setCreating(true);
 
     let serviceCharge = 0;
@@ -112,9 +119,10 @@ const TicketsPage = () => {
 
     setCreating(false);
     if (error) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      console.error("Ticket creation error:", error);
+      toast({ title: "Error creating ticket", description: error.message, variant: "destructive" });
     } else {
-      toast({ title: "Ticket created" });
+      toast({ title: "Ticket created successfully" });
       setDialogOpen(false);
       setForm({ customer_name: "", customer_phone: "", issue: "", category: "General", priority: "Medium", product_id: "", customer_address: "", customer_latitude: "", customer_longitude: "", complaint_description: "", customer_explanation: "" });
     }
