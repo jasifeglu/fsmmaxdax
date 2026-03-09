@@ -1,8 +1,12 @@
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { useDemoMode } from "@/hooks/useDemoMode";
 
-const alerts = [
+const mockAlerts = [
   { text: "SLA breach: MXD-001020 overdue by 2 hours", type: "destructive", time: "5 min ago" },
   { text: "Service delay: Amit P. running 30 min behind on MXD-001041", type: "warning", time: "12 min ago" },
   { text: "Escalation: MXD-001028 — 3rd complaint from customer", type: "destructive", time: "18 min ago" },
@@ -20,29 +24,71 @@ const typeColors: Record<string, string> = {
   info: "bg-info",
 };
 
-export const AlertsNotificationsPanel = () => (
-  <Card className="glass-card">
-    <CardHeader className="pb-2">
-      <CardTitle className="text-sm font-medium">🚨 Alerts & Notifications</CardTitle>
-    </CardHeader>
-    <CardContent>
-      <div className="space-y-2.5 max-h-[320px] overflow-y-auto pr-1">
-        {alerts.map((a, i) => (
-          <motion.div
-            key={i}
-            initial={{ opacity: 0, x: -8 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: i * 0.04 }}
-            className="flex gap-3 text-xs"
-          >
-            <span className={cn("mt-1.5 h-2 w-2 rounded-full shrink-0", typeColors[a.type])} />
-            <div className="min-w-0">
-              <p className="text-foreground leading-relaxed">{a.text}</p>
-              <p className="text-muted-foreground mt-0.5">{a.time}</p>
-            </div>
-          </motion.div>
-        ))}
-      </div>
-    </CardContent>
-  </Card>
-);
+export const AlertsNotificationsPanel = () => {
+  const isDemoMode = useDemoMode();
+  const { user } = useAuth();
+  const [realAlerts, setRealAlerts] = useState<{ text: string; type: string; time: string }[]>([]);
+
+  useEffect(() => {
+    if (!user?.id) return;
+    const fetch = async () => {
+      const { data } = await supabase
+        .from("notifications")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(10);
+      const mapped = (data || []).map(n => {
+        const typeMap: Record<string, string> = { error: "destructive", warning: "warning", success: "success", info: "info" };
+        const ago = getTimeAgo(n.created_at);
+        return { text: n.message || n.title, type: typeMap[n.type] || "info", time: ago };
+      });
+      setRealAlerts(mapped);
+    };
+    fetch();
+  }, [user?.id]);
+
+  const alerts = isDemoMode ? mockAlerts : realAlerts;
+
+  return (
+    <Card className="glass-card">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-sm font-medium">🚨 Alerts & Notifications</CardTitle>
+      </CardHeader>
+      <CardContent>
+        {alerts.length === 0 ? (
+          <p className="text-center text-xs text-muted-foreground py-8">No alerts or notifications</p>
+        ) : (
+          <div className="space-y-2.5 max-h-[320px] overflow-y-auto pr-1">
+            {alerts.map((a, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, x: -8 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: i * 0.04 }}
+                className="flex gap-3 text-xs"
+              >
+                <span className={cn("mt-1.5 h-2 w-2 rounded-full shrink-0", typeColors[a.type])} />
+                <div className="min-w-0">
+                  <p className="text-foreground leading-relaxed">{a.text}</p>
+                  <p className="text-muted-foreground mt-0.5">{a.time}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+};
+
+function getTimeAgo(dateStr: string): string {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return "Just now";
+  if (mins < 60) return `${mins} min ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs} hr ago`;
+  const days = Math.floor(hrs / 24);
+  return `${days}d ago`;
+}
