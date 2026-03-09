@@ -119,9 +119,10 @@ const TicketsPage = () => {
 
     setCreating(false);
     if (error) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      console.error("Ticket creation error:", error);
+      toast({ title: "Error creating ticket", description: error.message, variant: "destructive" });
     } else {
-      toast({ title: "Ticket created" });
+      toast({ title: "Ticket created successfully" });
       setDialogOpen(false);
       setForm({ customer_name: "", customer_phone: "", issue: "", category: "General", priority: "Medium", product_id: "", customer_address: "", customer_latitude: "", customer_longitude: "", complaint_description: "", customer_explanation: "" });
     }
