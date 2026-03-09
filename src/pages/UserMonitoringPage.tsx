@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { exportCSV, exportPDF } from "@/lib/exportUtils";
 import { PageHeader } from "@/components/PageHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -22,24 +22,26 @@ import {
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
+import { supabase } from "@/integrations/supabase/client";
+import { useDemoMode } from "@/hooks/useDemoMode";
 
-const allUsers = [
-  { id: 1, name: "Amit Patel", initials: "AP", role: "Technician", status: "Available", tickets: 432, completed: 398, rating: 4.6, revenue: "₹3.02L", efficiency: 92, branch: "Ahmedabad East" },
-  { id: 2, name: "Suresh Kumar", initials: "SK", role: "Technician", status: "Available", tickets: 389, completed: 355, rating: 4.3, revenue: "₹2.78L", efficiency: 88, branch: "Mumbai West" },
-  { id: 3, name: "Deepak Rao", initials: "DR", role: "Technician", status: "Offline", tickets: 267, completed: 230, rating: 4.1, revenue: "₹1.95L", efficiency: 79, branch: "Pune Central" },
-  { id: 4, name: "Vikram Singh", initials: "VS", role: "Technician", status: "On Leave", tickets: 312, completed: 285, rating: 4.5, revenue: "₹2.45L", efficiency: 85, branch: "Delhi NCR" },
-  { id: 5, name: "Neha Gupta", initials: "NG", role: "Coordinator", status: "Available", tickets: 856, completed: 790, rating: 4.5, revenue: "—", efficiency: 91, branch: "Pune West" },
-  { id: 6, name: "Rahul Singh", initials: "RS", role: "Coordinator", status: "Available", tickets: 720, completed: 660, rating: 4.2, revenue: "—", efficiency: 86, branch: "Mumbai Central" },
+const mockUsers = [
+  { id: "m1", name: "Amit Patel", initials: "AP", role: "Technician", status: "Available", tickets: 432, completed: 398, rating: 4.6, revenue: "₹3.02L", efficiency: 92, branch: "Ahmedabad East" },
+  { id: "m2", name: "Suresh Kumar", initials: "SK", role: "Technician", status: "Available", tickets: 389, completed: 355, rating: 4.3, revenue: "₹2.78L", efficiency: 88, branch: "Mumbai West" },
+  { id: "m3", name: "Deepak Rao", initials: "DR", role: "Technician", status: "Offline", tickets: 267, completed: 230, rating: 4.1, revenue: "₹1.95L", efficiency: 79, branch: "Pune Central" },
+  { id: "m4", name: "Vikram Singh", initials: "VS", role: "Technician", status: "On Leave", tickets: 312, completed: 285, rating: 4.5, revenue: "₹2.45L", efficiency: 85, branch: "Delhi NCR" },
+  { id: "m5", name: "Neha Gupta", initials: "NG", role: "Coordinator", status: "Available", tickets: 856, completed: 790, rating: 4.5, revenue: "—", efficiency: 91, branch: "Pune West" },
+  { id: "m6", name: "Rahul Singh", initials: "RS", role: "Coordinator", status: "Available", tickets: 720, completed: 660, rating: 4.2, revenue: "—", efficiency: 86, branch: "Mumbai Central" },
 ];
 
-const comparisonData = [
+const mockComparisonData = [
   { name: "Amit P.", completed: 398, rating: 4.6, efficiency: 92 },
   { name: "Suresh K.", completed: 355, rating: 4.3, efficiency: 88 },
   { name: "Deepak R.", completed: 230, rating: 4.1, efficiency: 79 },
   { name: "Vikram S.", completed: 285, rating: 4.5, efficiency: 85 },
 ];
 
-const radarCompare = [
+const mockRadarCompare = [
   { metric: "Speed", userA: 85, userB: 78 },
   { metric: "Quality", userA: 92, userB: 85 },
   { metric: "Punctuality", userA: 78, userB: 88 },
@@ -48,7 +50,7 @@ const radarCompare = [
   { metric: "Revenue", userA: 75, userB: 70 },
 ];
 
-const activityHistory = [
+const mockActivityHistory = [
   { time: "10:32 AM", action: "Completed job TKT-1042 at Andheri", type: "success" },
   { time: "09:15 AM", action: "Checked in at customer site", type: "info" },
   { time: "09:00 AM", action: "Logged in", type: "info" },
@@ -64,10 +66,62 @@ const chartStyle = {
   fontSize: 12,
 };
 
+type UserRow = {
+  id: string;
+  name: string;
+  initials: string;
+  role: string;
+  status: string;
+  tickets: number;
+  completed: number;
+  rating: number;
+  revenue: string;
+  efficiency: number;
+  branch: string;
+};
+
 const UserMonitoringPage = () => {
+  const isDemoMode = useDemoMode();
   const [filter, setFilter] = useState("all");
   const [search, setSearch] = useState("");
-  const [selectedUser, setSelectedUser] = useState<typeof allUsers[0] | null>(null);
+  const [selectedUser, setSelectedUser] = useState<UserRow | null>(null);
+  const [realUsers, setRealUsers] = useState<UserRow[]>([]);
+
+  useEffect(() => {
+    const fetchReal = async () => {
+      const { data: profiles } = await supabase.from("profiles").select("id, full_name, email");
+      const { data: roles } = await supabase.from("user_roles").select("user_id, role");
+      const { data: tickets } = await supabase.from("tickets").select("assigned_to, status");
+
+      const users: UserRow[] = (profiles || []).map(p => {
+        const userRole = (roles || []).find(r => r.user_id === p.id);
+        const assigned = (tickets || []).filter(t => t.assigned_to === p.id);
+        const completedCount = assigned.filter(t => ["Completed", "Closed"].includes(t.status)).length;
+        const name = p.full_name || p.email || "Unknown";
+        const initials = name.split(" ").map((w: string) => w[0]).join("").slice(0, 2).toUpperCase();
+        return {
+          id: p.id,
+          name,
+          initials,
+          role: userRole?.role === "admin" ? "Admin" : userRole?.role === "coordinator" ? "Coordinator" : "Technician",
+          status: "Available",
+          tickets: assigned.length,
+          completed: completedCount,
+          rating: 0,
+          revenue: "—",
+          efficiency: assigned.length > 0 ? Math.round(completedCount / assigned.length * 100) : 0,
+          branch: "—",
+        };
+      });
+      setRealUsers(users);
+    };
+    fetchReal();
+  }, []);
+
+  const allUsers = isDemoMode ? mockUsers : realUsers;
+  const comparisonData = isDemoMode ? mockComparisonData : [];
+  const radarCompare = isDemoMode ? mockRadarCompare : [];
+  const activityHistory = isDemoMode ? mockActivityHistory : [];
 
   const filtered = allUsers.filter((u) => {
     const matchRole = filter === "all" || u.role.toLowerCase() === filter;
@@ -76,11 +130,12 @@ const UserMonitoringPage = () => {
   });
   const monitorHeaders = ["Name", "Role", "Status", "Tickets", "Completed", "Efficiency", "Rating", "Branch"];
   const monitorRows = filtered.map((u) => [u.name, u.role, u.status, u.tickets, u.completed, `${u.efficiency}%`, u.rating, u.branch]);
+  const avgEff = allUsers.length > 0 ? Math.round(allUsers.reduce((s, u) => s + u.efficiency, 0) / allUsers.length) : 0;
+  const avgRat = allUsers.length > 0 ? (allUsers.reduce((s, u) => s + u.rating, 0) / allUsers.length).toFixed(1) : "0";
   const monitorSummary = [
     { label: "Total Staff", value: allUsers.length },
-    { label: "Avg Efficiency", value: "87%" },
-    { label: "Avg Rating", value: "4.4/5" },
-    { label: "Total Revenue", value: "₹10.2L" },
+    { label: "Avg Efficiency", value: `${avgEff}%` },
+    { label: "Avg Rating", value: `${avgRat}/5` },
   ];
 
   return (
@@ -98,10 +153,10 @@ const UserMonitoringPage = () => {
 
       {/* Summary stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <StatCard title="Total Staff" value={allUsers.length} change="4 technicians, 2 coordinators" changeType="neutral" icon={Users} iconColor="text-primary" />
-        <StatCard title="Avg Efficiency" value="87%" change="+3% this month" changeType="positive" icon={TrendingUp} iconColor="text-success" />
-        <StatCard title="Avg Rating" value="4.4/5" change="Across all staff" changeType="positive" icon={Star} iconColor="text-warning" />
-        <StatCard title="Total Revenue" value="₹10.2L" change="From technicians" changeType="positive" icon={DollarSign} iconColor="text-info" />
+        <StatCard title="Total Staff" value={allUsers.length} icon={Users} iconColor="text-primary" />
+        <StatCard title="Avg Efficiency" value={`${avgEff}%`} icon={TrendingUp} iconColor="text-success" />
+        <StatCard title="Avg Rating" value={`${avgRat}/5`} icon={Star} iconColor="text-warning" />
+        <StatCard title="Total Tickets" value={allUsers.reduce((s, u) => s + u.tickets, 0)} icon={Ticket} iconColor="text-info" />
       </div>
 
       {/* Filters */}
@@ -121,98 +176,110 @@ const UserMonitoringPage = () => {
       </div>
 
       {/* User table */}
-      <Card className="glass-card mb-6">
-        <CardContent className="pt-4">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="text-muted-foreground text-xs border-b">
-                  <th className="text-left py-2 font-medium">User</th>
-                  <th className="text-left py-2 font-medium">Role</th>
-                  <th className="text-left py-2 font-medium">Status</th>
-                  <th className="text-left py-2 font-medium hidden md:table-cell">Tickets</th>
-                  <th className="text-left py-2 font-medium hidden md:table-cell">Completed</th>
-                  <th className="text-left py-2 font-medium hidden sm:table-cell">Efficiency</th>
-                  <th className="text-left py-2 font-medium hidden lg:table-cell">Rating</th>
-                  <th className="text-left py-2 font-medium">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map((u) => (
-                  <tr key={u.id} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
-                    <td className="py-2.5">
-                      <div className="flex items-center gap-2">
-                        <Avatar className="h-7 w-7">
-                          <AvatarFallback className="text-[10px] bg-primary/10 text-primary">{u.initials}</AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <p className="font-medium text-foreground">{u.name}</p>
-                          <p className="text-[10px] text-muted-foreground">{u.branch}</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="py-2.5"><span className="badge-primary">{u.role}</span></td>
-                    <td className="py-2.5"><StatusBadge status={u.status} /></td>
-                    <td className="py-2.5 hidden md:table-cell text-foreground">{u.tickets}</td>
-                    <td className="py-2.5 hidden md:table-cell text-foreground">{u.completed}</td>
-                    <td className="py-2.5 hidden sm:table-cell">
-                      <div className="flex items-center gap-2">
-                        <div className="w-16 h-1.5 rounded-full bg-muted overflow-hidden">
-                          <div className="h-full rounded-full bg-primary" style={{ width: `${u.efficiency}%` }} />
-                        </div>
-                        <span className="text-xs text-foreground">{u.efficiency}%</span>
-                      </div>
-                    </td>
-                    <td className="py-2.5 hidden lg:table-cell">
-                      <span className="flex items-center gap-1 text-foreground">
-                        <Star className="h-3 w-3 text-warning fill-warning" /> {u.rating}
-                      </span>
-                    </td>
-                    <td className="py-2.5">
-                      <Button variant="ghost" size="sm" className="text-xs h-7 gap-1" onClick={() => setSelectedUser(u)}>
-                        <Eye className="h-3 w-3" /> View
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </CardContent>
-      </Card>
+      {allUsers.length === 0 ? (
+        <div className="text-center py-16 text-muted-foreground">
+          <Users className="h-10 w-10 mx-auto mb-3 opacity-30" />
+          <p className="text-sm">No user data available</p>
+          <p className="text-xs mt-1">Enable Demo Mode in Settings to see sample data</p>
+        </div>
+      ) : (
+        <>
+          <Card className="glass-card mb-6">
+            <CardContent className="pt-4">
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="text-muted-foreground text-xs border-b">
+                      <th className="text-left py-2 font-medium">User</th>
+                      <th className="text-left py-2 font-medium">Role</th>
+                      <th className="text-left py-2 font-medium">Status</th>
+                      <th className="text-left py-2 font-medium hidden md:table-cell">Tickets</th>
+                      <th className="text-left py-2 font-medium hidden md:table-cell">Completed</th>
+                      <th className="text-left py-2 font-medium hidden sm:table-cell">Efficiency</th>
+                      <th className="text-left py-2 font-medium hidden lg:table-cell">Rating</th>
+                      <th className="text-left py-2 font-medium">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filtered.map((u) => (
+                      <tr key={u.id} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
+                        <td className="py-2.5">
+                          <div className="flex items-center gap-2">
+                            <Avatar className="h-7 w-7">
+                              <AvatarFallback className="text-[10px] bg-primary/10 text-primary">{u.initials}</AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <p className="font-medium text-foreground">{u.name}</p>
+                              <p className="text-[10px] text-muted-foreground">{u.branch}</p>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="py-2.5"><span className="badge-primary">{u.role}</span></td>
+                        <td className="py-2.5"><StatusBadge status={u.status} /></td>
+                        <td className="py-2.5 hidden md:table-cell text-foreground">{u.tickets}</td>
+                        <td className="py-2.5 hidden md:table-cell text-foreground">{u.completed}</td>
+                        <td className="py-2.5 hidden sm:table-cell">
+                          <div className="flex items-center gap-2">
+                            <div className="w-16 h-1.5 rounded-full bg-muted overflow-hidden">
+                              <div className="h-full rounded-full bg-primary" style={{ width: `${u.efficiency}%` }} />
+                            </div>
+                            <span className="text-xs text-foreground">{u.efficiency}%</span>
+                          </div>
+                        </td>
+                        <td className="py-2.5 hidden lg:table-cell">
+                          <span className="flex items-center gap-1 text-foreground">
+                            <Star className="h-3 w-3 text-warning fill-warning" /> {u.rating > 0 ? u.rating : "—"}
+                          </span>
+                        </td>
+                        <td className="py-2.5">
+                          <Button variant="ghost" size="sm" className="text-xs h-7 gap-1" onClick={() => setSelectedUser(u)}>
+                            <Eye className="h-3 w-3" /> View
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
 
-      {/* Comparison charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
-        <Card className="glass-card">
-          <CardHeader className="pb-2"><CardTitle className="text-sm font-medium">Technician Comparison — Jobs Completed</CardTitle></CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={220}>
-              <BarChart data={comparisonData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                <XAxis dataKey="name" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} />
-                <YAxis tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} />
-                <Tooltip contentStyle={chartStyle} />
-                <Bar dataKey="completed" fill="hsl(var(--chart-1))" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
+          {/* Comparison charts - only in demo mode */}
+          {isDemoMode && comparisonData.length > 0 && (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+              <Card className="glass-card">
+                <CardHeader className="pb-2"><CardTitle className="text-sm font-medium">Technician Comparison — Jobs Completed</CardTitle></CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={220}>
+                    <BarChart data={comparisonData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                      <XAxis dataKey="name" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} />
+                      <YAxis tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} />
+                      <Tooltip contentStyle={chartStyle} />
+                      <Bar dataKey="completed" fill="hsl(var(--chart-1))" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
 
-        <Card className="glass-card">
-          <CardHeader className="pb-2"><CardTitle className="text-sm font-medium">Skill Comparison — Top 2 Technicians</CardTitle></CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={220}>
-              <RadarChart data={radarCompare}>
-                <PolarGrid stroke="hsl(var(--border))" />
-                <PolarAngleAxis dataKey="metric" tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} />
-                <PolarRadiusAxis tick={false} axisLine={false} />
-                <Radar dataKey="userA" stroke="hsl(var(--chart-1))" fill="hsl(var(--chart-1))" fillOpacity={0.15} name="Amit P." />
-                <Radar dataKey="userB" stroke="hsl(var(--chart-4))" fill="hsl(var(--chart-4))" fillOpacity={0.15} name="Suresh K." />
-              </RadarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-      </div>
+              <Card className="glass-card">
+                <CardHeader className="pb-2"><CardTitle className="text-sm font-medium">Skill Comparison — Top 2 Technicians</CardTitle></CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={220}>
+                    <RadarChart data={radarCompare}>
+                      <PolarGrid stroke="hsl(var(--border))" />
+                      <PolarAngleAxis dataKey="metric" tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} />
+                      <PolarRadiusAxis tick={false} axisLine={false} />
+                      <Radar dataKey="userA" stroke="hsl(var(--chart-1))" fill="hsl(var(--chart-1))" fillOpacity={0.15} name="Amit P." />
+                      <Radar dataKey="userB" stroke="hsl(var(--chart-4))" fill="hsl(var(--chart-4))" fillOpacity={0.15} name="Suresh K." />
+                    </RadarChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+        </>
+      )}
 
       {/* User detail dialog */}
       <Dialog open={!!selectedUser} onOpenChange={() => setSelectedUser(null)}>
@@ -236,7 +303,7 @@ const UserMonitoringPage = () => {
                   { label: "Tickets", value: selectedUser.tickets, icon: Ticket, color: "text-primary" },
                   { label: "Completed", value: selectedUser.completed, icon: CheckCircle2, color: "text-success" },
                   { label: "Efficiency", value: `${selectedUser.efficiency}%`, icon: Target, color: "text-info" },
-                  { label: "Rating", value: selectedUser.rating, icon: Star, color: "text-warning" },
+                  { label: "Rating", value: selectedUser.rating > 0 ? selectedUser.rating : "—", icon: Star, color: "text-warning" },
                 ].map((s) => (
                   <div key={s.label} className="rounded-lg bg-muted/50 p-3 text-center">
                     <s.icon className={`h-4 w-4 mx-auto mb-1 ${s.color}`} />
@@ -246,20 +313,22 @@ const UserMonitoringPage = () => {
                 ))}
               </div>
 
-              <div className="mt-4">
-                <h4 className="text-sm font-medium text-foreground mb-3">Recent Activity</h4>
-                <div className="space-y-2.5">
-                  {activityHistory.map((a, i) => (
-                    <motion.div key={i} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.03 }} className="flex gap-3 text-xs">
-                      <span className={`mt-1.5 h-1.5 w-1.5 rounded-full shrink-0 ${a.type === "success" ? "bg-success" : "bg-info"}`} />
-                      <div>
-                        <p className="text-foreground">{a.action}</p>
-                        <p className="text-muted-foreground">{a.time}</p>
-                      </div>
-                    </motion.div>
-                  ))}
+              {isDemoMode && activityHistory.length > 0 && (
+                <div className="mt-4">
+                  <h4 className="text-sm font-medium text-foreground mb-3">Recent Activity</h4>
+                  <div className="space-y-2.5">
+                    {activityHistory.map((a, i) => (
+                      <motion.div key={i} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.03 }} className="flex gap-3 text-xs">
+                        <span className={`mt-1.5 h-1.5 w-1.5 rounded-full shrink-0 ${a.type === "success" ? "bg-success" : "bg-info"}`} />
+                        <div>
+                          <p className="text-foreground">{a.action}</p>
+                          <p className="text-muted-foreground">{a.time}</p>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
             </>
           )}
         </DialogContent>
