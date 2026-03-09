@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { FlaskConical, AlertTriangle, Users, Ticket, Wrench, Receipt, Package, BarChart3 } from "lucide-react";
 import { SettingSection, SettingToggle } from "./SettingsShared";
+import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -146,7 +147,6 @@ export const MockDataSettings = ({ settings, update }: Props) => {
 };
 
 // Inline switch that doesn't render label (parent handles layout)
-import { Switch } from "@/components/ui/switch";
 
 const SettingToggleInline = ({ settingKey, settings, update, disabled }: {
   settingKey: string;
