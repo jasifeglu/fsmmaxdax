@@ -106,7 +106,7 @@ const App = () => (
               <Route path="/forgot-password" element={<PublicRoute><ForgotPasswordPage /></PublicRoute>} />
               <Route path="/reset-password" element={<ResetPasswordPage />} />
               <Route path="/install" element={<InstallPage />} />
-              <Route path="/*" element={<ProtectedRoutes />} />
+              <Route path="/*" element={<AppRoutes />} />
             </Routes>
           </Suspense>
         </BrowserRouter>
