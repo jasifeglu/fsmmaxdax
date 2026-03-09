@@ -67,7 +67,10 @@ const ProductCatalogPage = () => {
   };
 
   const handleSave = async () => {
-    if (!form.name || !form.brand) return;
+    if (!form.name || !form.brand) {
+      toast({ title: "Please fill required fields", description: "Product name and brand are required", variant: "destructive" });
+      return;
+    }
     setSaving(true);
     const payload = { ...form, service_price: Number(form.service_price), warranty_months: Number(form.warranty_months) };
 

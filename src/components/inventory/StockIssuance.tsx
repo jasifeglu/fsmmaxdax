@@ -40,7 +40,10 @@ export const StockIssuance = ({ items, onRefresh }: Props) => {
   }, []);
 
   const handleIssue = async () => {
-    if (!form.inventory_id || !form.user_id || form.quantity <= 0) return;
+    if (!form.inventory_id || !form.user_id || form.quantity <= 0) {
+      toast({ title: "Please fill required fields", description: "Select an item, technician, and valid quantity", variant: "destructive" });
+      return;
+    }
     const item = items.find(i => i.id === form.inventory_id);
     if (!item || item.warehouse_stock < form.quantity) {
       toast({ title: "Insufficient stock", variant: "destructive" });

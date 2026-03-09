@@ -28,7 +28,10 @@ export const WarehouseCatalog = ({ items, loading, onRefresh }: Props) => {
   const [form, setForm] = useState({ name: "", sku: "", category: "Electrical", warehouse_stock: 0, min_stock: 5, price: 0 });
 
   const handleCreate = async () => {
-    if (!form.name || !form.sku) return;
+    if (!form.name || !form.sku) {
+      toast({ title: "Please fill required fields", description: "Item name and SKU are required", variant: "destructive" });
+      return;
+    }
     setCreating(true);
     const status = form.warehouse_stock <= 0 ? "Critical" : form.warehouse_stock < form.min_stock ? "Low" : "OK";
     const { error } = await supabase.from("inventory").insert({ ...form, status });
