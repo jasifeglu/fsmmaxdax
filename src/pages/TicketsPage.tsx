@@ -107,6 +107,7 @@ const TicketsPage = () => {
       distanceCharge = dc.charge;
     }
 
+    const selectedTech = technicians.find(t => t.id === form.assigned_to);
     const { error } = await supabase.from("tickets").insert({
       ticket_number: generateTicketNumber(),
       customer_name: form.customer_name,
@@ -114,8 +115,10 @@ const TicketsPage = () => {
       issue: form.issue,
       category: form.category,
       priority: form.priority,
-      status: "New",
+      status: form.assigned_to ? "Assigned" : "New",
       created_by: user?.id,
+      assigned_to: form.assigned_to || null,
+      assignee_name: selectedTech?.name || null,
       product_id: form.product_id || null,
       customer_address: form.customer_address,
       customer_latitude: form.customer_latitude ? Number(form.customer_latitude) : null,
