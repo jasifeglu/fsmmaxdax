@@ -39,20 +39,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   const fetchUserData = useCallback(async (userId: string) => {
-    // Fetch role and profile in parallel
-    const [roleRes, profileRes] = await Promise.all([
-      supabase.from("user_roles").select("role").eq("user_id", userId).single(),
-      supabase.from("profiles").select("full_name, email, avatar_url").eq("id", userId).single(),
-    ]);
+    try {
+      // Fetch role and profile in parallel
+      const [roleRes, profileRes] = await Promise.all([
+        supabase.from("user_roles").select("role").eq("user_id", userId).single(),
+        supabase.from("profiles").select("full_name, email, avatar_url").eq("id", userId).single(),
+      ]);
 
-    if (roleRes.data) {
-      setRole(roleRes.data.role as UserRole);
-    }
+      if (roleRes.data) {
+        setRole(roleRes.data.role as UserRole);
+      }
 
-    if (profileRes.data) {
-      setUserName(profileRes.data.full_name || profileRes.data.email || "User");
-      const signedUrl = await getSignedAvatarUrl(profileRes.data.avatar_url);
-      setAvatarUrl(signedUrl);
+      if (profileRes.data) {
+        setUserName(profileRes.data.full_name || profileRes.data.email || "User");
+        try {
+          const signedUrl = await getSignedAvatarUrl(profileRes.data.avatar_url);
+          setAvatarUrl(signedUrl);
+        } catch {
+          setAvatarUrl(null);
+        }
+      }
+    } catch (err) {
+      console.error("fetchUserData error:", err);
     }
   }, []);
 
@@ -105,6 +113,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (session?.user) {
         await fetchUserData(session.user.id);
       }
+      if (mounted) setLoading(false);
+    }).catch(() => {
       if (mounted) setLoading(false);
     });
 
