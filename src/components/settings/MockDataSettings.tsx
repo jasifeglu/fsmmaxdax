@@ -147,7 +147,6 @@ export const MockDataSettings = ({ settings, update }: Props) => {
 };
 
 // Inline switch that doesn't render label (parent handles layout)
-import { Switch } from "@/components/ui/switch";
 
 const SettingToggleInline = ({ settingKey, settings, update, disabled }: {
   settingKey: string;
