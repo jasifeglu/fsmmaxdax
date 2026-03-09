@@ -72,7 +72,14 @@ const TicketsPage = () => {
   const generateTicketNumber = () => `MXD-${Math.floor(100000 + Math.random() * 900000)}`;
 
   const handleCreate = async () => {
-    if (!form.customer_name || !form.issue) return;
+    if (!form.customer_name.trim()) {
+      toast({ title: "Validation Error", description: "Customer name is required", variant: "destructive" });
+      return;
+    }
+    if (!form.issue.trim()) {
+      toast({ title: "Validation Error", description: "Issue summary is required", variant: "destructive" });
+      return;
+    }
     setCreating(true);
 
     let serviceCharge = 0;
