@@ -43,6 +43,7 @@ const TicketsPage = () => {
   const [creating, setCreating] = useState(false);
   const [detailTicket, setDetailTicket] = useState<any | null>(null);
   const [products, setProducts] = useState<any[]>([]);
+  const [technicians, setTechnicians] = useState<{ id: string; name: string }[]>([]);
 
   const [form, setForm] = useState({
     customer_name: "", customer_phone: "", issue: "",
@@ -50,6 +51,7 @@ const TicketsPage = () => {
     product_id: "", customer_address: "",
     customer_latitude: "", customer_longitude: "",
     complaint_description: "", customer_explanation: "",
+    assigned_to: "",
   });
 
   const fetchTickets = async () => {
@@ -63,6 +65,14 @@ const TicketsPage = () => {
     fetchTickets();
     supabase.from("product_catalog").select("id, name, service_price, hsn_sac_code, category").eq("is_active", true).order("name")
       .then(({ data }) => setProducts(data || []));
+    // Fetch technicians for assignment
+    Promise.all([
+      supabase.from("profiles").select("id, full_name"),
+      supabase.from("user_roles").select("user_id").eq("role", "technician"),
+    ]).then(([pRes, rRes]) => {
+      const techIds = new Set((rRes.data || []).map((r: any) => r.user_id));
+      setTechnicians((pRes.data || []).filter((p: any) => techIds.has(p.id)).map((p: any) => ({ id: p.id, name: p.full_name })));
+    });
     const channel = supabase.channel("tickets-changes")
       .on("postgres_changes", { event: "*", schema: "public", table: "tickets" }, () => fetchTickets())
       .subscribe();
@@ -97,6 +107,7 @@ const TicketsPage = () => {
       distanceCharge = dc.charge;
     }
 
+    const selectedTech = technicians.find(t => t.id === form.assigned_to);
     const { error } = await supabase.from("tickets").insert({
       ticket_number: generateTicketNumber(),
       customer_name: form.customer_name,
@@ -104,8 +115,10 @@ const TicketsPage = () => {
       issue: form.issue,
       category: form.category,
       priority: form.priority,
-      status: "New",
+      status: form.assigned_to ? "Assigned" : "New",
       created_by: user?.id,
+      assigned_to: form.assigned_to || null,
+      assignee_name: selectedTech?.name || null,
       product_id: form.product_id || null,
       customer_address: form.customer_address,
       customer_latitude: form.customer_latitude ? Number(form.customer_latitude) : null,
@@ -124,7 +137,7 @@ const TicketsPage = () => {
     } else {
       toast({ title: "Ticket created successfully" });
       setDialogOpen(false);
-      setForm({ customer_name: "", customer_phone: "", issue: "", category: "General", priority: "Medium", product_id: "", customer_address: "", customer_latitude: "", customer_longitude: "", complaint_description: "", customer_explanation: "" });
+      setForm({ customer_name: "", customer_phone: "", issue: "", category: "General", priority: "Medium", product_id: "", customer_address: "", customer_latitude: "", customer_longitude: "", complaint_description: "", customer_explanation: "", assigned_to: "" });
     }
   };
 
@@ -216,6 +229,15 @@ const TicketsPage = () => {
                     </SelectContent>
                   </Select>
                 </div>
+              </div>
+              <div>
+                <Label className="text-xs">Assign Technician</Label>
+                <Select value={form.assigned_to} onValueChange={(v) => setForm({ ...form, assigned_to: v })}>
+                  <SelectTrigger className="mt-1"><SelectValue placeholder="Unassigned (optional)" /></SelectTrigger>
+                  <SelectContent>
+                    {technicians.map(t => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}
+                  </SelectContent>
+                </Select>
               </div>
               <Button onClick={handleCreate} disabled={creating} className="w-full">
                 {creating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Create Ticket
