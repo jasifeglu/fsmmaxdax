@@ -137,7 +137,7 @@ const TicketsPage = () => {
     } else {
       toast({ title: "Ticket created successfully" });
       setDialogOpen(false);
-      setForm({ customer_name: "", customer_phone: "", issue: "", category: "General", priority: "Medium", product_id: "", customer_address: "", customer_latitude: "", customer_longitude: "", complaint_description: "", customer_explanation: "" });
+      setForm({ customer_name: "", customer_phone: "", issue: "", category: "General", priority: "Medium", product_id: "", customer_address: "", customer_latitude: "", customer_longitude: "", complaint_description: "", customer_explanation: "", assigned_to: "" });
     }
   };
 
