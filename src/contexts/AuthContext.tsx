@@ -72,12 +72,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     let mounted = true;
+    const MAX_AUTH_LOADING_MS = 5000;
+    const MAX_PROFILE_FETCH_MS = 2500;
+
+    const loadingFailsafe = window.setTimeout(() => {
+      if (mounted) setLoading(false);
+    }, MAX_AUTH_LOADING_MS);
+
+    const waitForUserData = async (userId: string) => {
+      await Promise.race([
+        fetchUserData(userId),
+        new Promise<void>((resolve) => window.setTimeout(resolve, MAX_PROFILE_FETCH_MS)),
+      ]).catch(() => undefined);
+    };
 
     // 1. Set up auth listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
         if (!mounted) return;
-        
+
         setSession(session);
         setUser(session?.user ?? null);
 
@@ -93,12 +106,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               device_info: navigator.userAgent.slice(0, 120),
             }).then(() => {});
           }
-          await fetchUserData(session.user.id);
+          await waitForUserData(session.user.id);
         } else {
           setRole("technician");
           setUserName("");
           setAvatarUrl(null);
         }
+
         if (mounted) setLoading(false);
       }
     );
@@ -106,13 +120,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // 2. Then get existing session
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (!mounted) return;
-      
+
       setSession(session);
       setUser(session?.user ?? null);
-      
+
       if (session?.user) {
-        await fetchUserData(session.user.id);
+        await waitForUserData(session.user.id);
       }
+
       if (mounted) setLoading(false);
     }).catch(() => {
       if (mounted) setLoading(false);
@@ -120,6 +135,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     return () => {
       mounted = false;
+      window.clearTimeout(loadingFailsafe);
       subscription.unsubscribe();
     };
   }, [fetchUserData]);
