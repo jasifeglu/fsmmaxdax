@@ -43,6 +43,7 @@ const TicketsPage = () => {
   const [creating, setCreating] = useState(false);
   const [detailTicket, setDetailTicket] = useState<any | null>(null);
   const [products, setProducts] = useState<any[]>([]);
+  const [technicians, setTechnicians] = useState<{ id: string; name: string }[]>([]);
 
   const [form, setForm] = useState({
     customer_name: "", customer_phone: "", issue: "",
@@ -50,6 +51,7 @@ const TicketsPage = () => {
     product_id: "", customer_address: "",
     customer_latitude: "", customer_longitude: "",
     complaint_description: "", customer_explanation: "",
+    assigned_to: "",
   });
 
   const fetchTickets = async () => {
