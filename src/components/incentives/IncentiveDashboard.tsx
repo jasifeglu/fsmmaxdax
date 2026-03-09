@@ -1,14 +1,17 @@
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { motion } from "framer-motion";
 import {
-  Trophy, Target, Star, Zap, Clock, DollarSign, TrendingUp, Award,
+  Trophy, Target, Star, Zap, Clock, DollarSign, TrendingUp, Award, BarChart3,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatINR } from "@/lib/formatINR";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { useDemoMode } from "@/hooks/useDemoMode";
 
-// Mock data for current technician
-const performanceData = {
+const mockPerformanceData = {
   month: "March 2026",
   performanceScore: 87,
   rank: 2,
@@ -59,7 +62,79 @@ const MetricCard = ({ icon: Icon, label, value, target, unit, color }: {
 );
 
 export const IncentiveDashboard = () => {
-  const d = performanceData;
+  const isDemoMode = useDemoMode();
+  const { user } = useAuth();
+  const [realData, setRealData] = useState<typeof mockPerformanceData | null>(null);
+
+  useEffect(() => {
+    if (isDemoMode || !user?.id) return;
+    const fetch = async () => {
+      const now = new Date();
+      const month = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+      const { data: inc } = await supabase
+        .from("technician_incentives")
+        .select("*")
+        .eq("user_id", user.id)
+        .eq("month", month)
+        .maybeSingle();
+
+      if (!inc) {
+        setRealData(null);
+        return;
+      }
+
+      // Get rank
+      const { data: allInc } = await supabase
+        .from("technician_incentives")
+        .select("user_id, performance_score")
+        .eq("month", month)
+        .order("performance_score", { ascending: false });
+      const rank = (allInc || []).findIndex(a => a.user_id === user.id) + 1;
+
+      setRealData({
+        month: now.toLocaleString("default", { month: "long", year: "numeric" }),
+        performanceScore: Number(inc.performance_score),
+        rank: rank || 1,
+        totalTechs: (allInc || []).length,
+        completedTickets: inc.completed_tickets,
+        ticketTarget: 30,
+        firstFixRate: Number(inc.first_fix_rate),
+        avgRating: Number(inc.avg_rating),
+        avgCompletionHours: Number(inc.avg_completion_hours),
+        revenueGenerated: Number(inc.revenue_generated),
+        onTimeRate: Number(inc.on_time_rate),
+        earnings: {
+          baseSalary: 0,
+          performanceBonus: Number(inc.performance_bonus),
+          revenueCommission: Number(inc.revenue_commission),
+          qualityBonus: Number(inc.quality_bonus),
+          speedBonus: Number(inc.speed_bonus),
+          attendanceBonus: Number(inc.attendance_bonus),
+          totalIncentive: Number(inc.total_incentive),
+          totalEarnings: Number(inc.total_incentive),
+        },
+        achievements: [
+          { name: "Quality Champion", icon: Star, earned: Number(inc.avg_rating) >= 4.5 },
+          { name: "Speed Demon", icon: Zap, earned: Number(inc.avg_completion_hours) <= 3 },
+          { name: "Ticket Master", icon: Target, earned: inc.completed_tickets >= 30 },
+          { name: "Perfect Attendance", icon: Clock, earned: Number(inc.attendance_bonus) > 0 },
+        ],
+      });
+    };
+    fetch();
+  }, [isDemoMode, user?.id]);
+
+  const d = isDemoMode ? mockPerformanceData : realData;
+
+  if (!d) {
+    return (
+      <div className="text-center py-16 text-muted-foreground">
+        <BarChart3 className="h-10 w-10 mx-auto mb-3 opacity-30" />
+        <p className="text-sm">No incentive data for this month</p>
+        <p className="text-xs mt-1">Your performance metrics will appear after monthly calculations</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">
@@ -128,7 +203,6 @@ export const IncentiveDashboard = () => {
           <CardContent>
             <div className="space-y-2">
               {[
-                { label: "Base Salary", value: d.earnings.baseSalary },
                 { label: "Performance Bonus", value: d.earnings.performanceBonus, highlight: true },
                 { label: "Revenue Commission", value: d.earnings.revenueCommission, highlight: true },
                 { label: "Quality Bonus", value: d.earnings.qualityBonus, highlight: true },
@@ -137,14 +211,14 @@ export const IncentiveDashboard = () => {
               ].map((item) => (
                 <div key={item.label} className="flex items-center justify-between text-sm py-1.5 border-b border-border/30">
                   <span className="text-muted-foreground">{item.label}</span>
-                   <span className={cn("font-mono font-medium", item.highlight && item.value > 0 && "text-success")}>
+                  <span className={cn("font-mono font-medium", item.highlight && item.value > 0 && "text-success")}>
                     {formatINR(item.value)}
                   </span>
                 </div>
               ))}
               <div className="flex items-center justify-between text-sm py-2 font-bold">
-                <span>Total Earnings</span>
-                <span className="text-primary font-mono">{formatINR(d.earnings.totalEarnings)}</span>
+                <span>Total Incentive</span>
+                <span className="text-primary font-mono">{formatINR(d.earnings.totalIncentive)}</span>
               </div>
             </div>
           </CardContent>
