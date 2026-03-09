@@ -65,6 +65,14 @@ const TicketsPage = () => {
     fetchTickets();
     supabase.from("product_catalog").select("id, name, service_price, hsn_sac_code, category").eq("is_active", true).order("name")
       .then(({ data }) => setProducts(data || []));
+    // Fetch technicians for assignment
+    Promise.all([
+      supabase.from("profiles").select("id, full_name"),
+      supabase.from("user_roles").select("user_id").eq("role", "technician"),
+    ]).then(([pRes, rRes]) => {
+      const techIds = new Set((rRes.data || []).map((r: any) => r.user_id));
+      setTechnicians((pRes.data || []).filter((p: any) => techIds.has(p.id)).map((p: any) => ({ id: p.id, name: p.full_name })));
+    });
     const channel = supabase.channel("tickets-changes")
       .on("postgres_changes", { event: "*", schema: "public", table: "tickets" }, () => fetchTickets())
       .subscribe();
