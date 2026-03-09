@@ -42,13 +42,7 @@ const PageLoader = () => (
   </div>
 );
 
-const RoleGuard = ({ allowed, children }: { allowed: UserRole[]; children: React.ReactNode }) => {
-  const { role } = useAuth();
-  if (!allowed.includes(role)) return <Navigate to="/" replace />;
-  return <>{children}</>;
-};
-
-const ProtectedRoutes = () => {
+const AppRoutes = () => {
   const { user, loading } = useAuth();
 
   if (loading) return <PageLoader />;
@@ -84,6 +78,14 @@ const ProtectedRoutes = () => {
   );
 };
 
+const RoleGuard = ({ allowed, children }: { allowed: UserRole[]; children: React.ReactNode }) => {
+  const { role } = useAuth();
+  if (!allowed.includes(role)) return <Navigate to="/" replace />;
+  return <>{children}</>;
+};
+
+// Removed duplicate - using AppRoutes above
+
 const PublicRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
   if (loading) return <PageLoader />;
@@ -104,7 +106,7 @@ const App = () => (
               <Route path="/forgot-password" element={<PublicRoute><ForgotPasswordPage /></PublicRoute>} />
               <Route path="/reset-password" element={<ResetPasswordPage />} />
               <Route path="/install" element={<InstallPage />} />
-              <Route path="/*" element={<ProtectedRoutes />} />
+              <Route path="/*" element={<AppRoutes />} />
             </Routes>
           </Suspense>
         </BrowserRouter>
