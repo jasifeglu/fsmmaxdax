@@ -641,6 +641,7 @@ export type Database = {
           email: string
           full_name: string
           id: string
+          reporting_manager_id: string | null
           updated_at: string
         }
         Insert: {
@@ -649,6 +650,7 @@ export type Database = {
           email?: string
           full_name?: string
           id: string
+          reporting_manager_id?: string | null
           updated_at?: string
         }
         Update: {
@@ -657,7 +659,47 @@ export type Database = {
           email?: string
           full_name?: string
           id?: string
+          reporting_manager_id?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      projects: {
+        Row: {
+          code: string | null
+          created_at: string
+          id: string
+          latitude: number | null
+          location: string | null
+          longitude: number | null
+          name: string
+          status: string
+          updated_at: string
+          zoho_project_id: string | null
+        }
+        Insert: {
+          code?: string | null
+          created_at?: string
+          id?: string
+          latitude?: number | null
+          location?: string | null
+          longitude?: number | null
+          name: string
+          status?: string
+          updated_at?: string
+          zoho_project_id?: string | null
+        }
+        Update: {
+          code?: string | null
+          created_at?: string
+          id?: string
+          latitude?: number | null
+          location?: string | null
+          longitude?: number | null
+          name?: string
+          status?: string
+          updated_at?: string
+          zoho_project_id?: string | null
         }
         Relationships: []
       }
@@ -751,6 +793,110 @@ export type Database = {
             columns: ["ticket_id"]
             isOneToOne: false
             referencedRelation: "tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      staff_attendance: {
+        Row: {
+          check_in_at: string
+          check_in_lat: number | null
+          check_in_lng: number | null
+          check_out_at: string | null
+          check_out_lat: number | null
+          check_out_lng: number | null
+          created_at: string
+          id: string
+          notes: string | null
+          project_id: string | null
+          ticket_id: string | null
+          user_id: string
+          zoho_synced: boolean
+        }
+        Insert: {
+          check_in_at?: string
+          check_in_lat?: number | null
+          check_in_lng?: number | null
+          check_out_at?: string | null
+          check_out_lat?: number | null
+          check_out_lng?: number | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          project_id?: string | null
+          ticket_id?: string | null
+          user_id: string
+          zoho_synced?: boolean
+        }
+        Update: {
+          check_in_at?: string
+          check_in_lat?: number | null
+          check_in_lng?: number | null
+          check_out_at?: string | null
+          check_out_lat?: number | null
+          check_out_lng?: number | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          project_id?: string | null
+          ticket_id?: string | null
+          user_id?: string
+          zoho_synced?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "staff_attendance_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "staff_attendance_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      staff_locations: {
+        Row: {
+          accuracy: number | null
+          attendance_id: string | null
+          id: string
+          latitude: number
+          longitude: number
+          recorded_at: string
+          speed: number | null
+          user_id: string
+        }
+        Insert: {
+          accuracy?: number | null
+          attendance_id?: string | null
+          id?: string
+          latitude: number
+          longitude: number
+          recorded_at?: string
+          speed?: number | null
+          user_id: string
+        }
+        Update: {
+          accuracy?: number | null
+          attendance_id?: string | null
+          id?: string
+          latitude?: number
+          longitude?: number
+          recorded_at?: string
+          speed?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "staff_locations_attendance_id_fkey"
+            columns: ["attendance_id"]
+            isOneToOne: false
+            referencedRelation: "staff_attendance"
             referencedColumns: ["id"]
           },
         ]
@@ -1222,48 +1368,94 @@ export type Database = {
       }
       travel_expenses: {
         Row: {
+          admin_note: string | null
           amount: number
+          approved_amount: number | null
           approved_by: string | null
           created_at: string
           description: string | null
           distance_km: number | null
+          expense_basis: string
           expense_date: string
           expense_type: string
+          hr_at: string | null
+          hr_by: string | null
+          hr_note: string | null
+          hr_status: string
           id: string
+          location: string | null
+          manager_at: string | null
+          manager_by: string | null
+          manager_note: string | null
+          manager_status: string
+          project_id: string | null
           receipt_url: string | null
           status: string
           ticket_id: string | null
           user_id: string
         }
         Insert: {
+          admin_note?: string | null
           amount?: number
+          approved_amount?: number | null
           approved_by?: string | null
           created_at?: string
           description?: string | null
           distance_km?: number | null
+          expense_basis?: string
           expense_date?: string
           expense_type?: string
+          hr_at?: string | null
+          hr_by?: string | null
+          hr_note?: string | null
+          hr_status?: string
           id?: string
+          location?: string | null
+          manager_at?: string | null
+          manager_by?: string | null
+          manager_note?: string | null
+          manager_status?: string
+          project_id?: string | null
           receipt_url?: string | null
           status?: string
           ticket_id?: string | null
           user_id: string
         }
         Update: {
+          admin_note?: string | null
           amount?: number
+          approved_amount?: number | null
           approved_by?: string | null
           created_at?: string
           description?: string | null
           distance_km?: number | null
+          expense_basis?: string
           expense_date?: string
           expense_type?: string
+          hr_at?: string | null
+          hr_by?: string | null
+          hr_note?: string | null
+          hr_status?: string
           id?: string
+          location?: string | null
+          manager_at?: string | null
+          manager_by?: string | null
+          manager_note?: string | null
+          manager_status?: string
+          project_id?: string | null
           receipt_url?: string | null
           status?: string
           ticket_id?: string | null
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "travel_expenses_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "travel_expenses_ticket_id_fkey"
             columns: ["ticket_id"]
@@ -1344,6 +1536,10 @@ export type Database = {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
+        Returns: boolean
+      }
+      is_manager_of: {
+        Args: { _manager: string; _staff: string }
         Returns: boolean
       }
     }
