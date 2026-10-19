@@ -1,0 +1,20 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1792396872246,
+      "tag": "0000_add_manager_hr_roles",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1792396910186,
+      "tag": "0001_geo_tracking_projects_expense_approvals",
+      "breakpoints": true
+    }
+  ]
+}
