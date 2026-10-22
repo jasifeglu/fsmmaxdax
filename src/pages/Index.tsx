@@ -7,7 +7,7 @@ const Index = () => {
   const { role } = useAuth();
 
   if (role === "coordinator") return <CoordinatorDashboard />;
-  if (role === "technician") return <TechnicianDashboard />;
+  if (role === "technician" || role === "manager" || role === "hr") return <TechnicianDashboard />;
   return <AdminDashboard />;
 };
 

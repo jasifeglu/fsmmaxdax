@@ -172,9 +172,17 @@ export const TechnicianDashboard = () => {
                         <Camera className="h-3 w-3" /> Check-In
                       </Button>
                     )}
-                    <Button size="sm" className="text-xs h-8 ml-auto bg-primary text-primary-foreground">
-                      Update Status
-                    </Button>
+                    <Select value={job.status} onValueChange={async (v) => {
+                      const { error } = await supabase.from("tickets").update({ status: v, ...(v === "Completed" ? { completed_at: new Date().toISOString() } : {}) }).eq("id", job.id);
+                      if (error) { toast({ title: "Update failed", description: error.message, variant: "destructive" }); return; }
+                      toast({ title: `Status: ${v}` });
+                      setJobs((prev) => v === "Completed" ? prev.filter((j) => j.id !== job.id) : prev.map((j) => j.id === job.id ? { ...j, status: v } : j));
+                    }}>
+                      <SelectTrigger className="w-40 h-8 text-xs ml-auto"><SelectValue placeholder="Update Status" /></SelectTrigger>
+                      <SelectContent>
+                        {["Assigned", "Scheduled", "On-Site Attempt", "Reinstallation", "Testing", "Completed"].map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
                   </div>
                 </CardContent>
               </Card>

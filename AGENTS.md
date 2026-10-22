@@ -1,0 +1,2 @@
+- Staff location is recorded only while a `staff_attendance` row is open (AttendanceControl in header); why: user chose tracking only while checked in.
+- Expense approval stages are enforced by DB triggers on `travel_expenses` (manager → HR, admin override); why: UI checks alone can be bypassed.

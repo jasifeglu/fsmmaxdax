@@ -4,7 +4,7 @@ import { useAuth, UserRole } from "@/contexts/AuthContext";
 import {
   LayoutDashboard, Ticket, Users, Wrench, Package, DollarSign,
   BarChart3, Settings, Calendar, ClipboardList, Map, ShoppingBag,
-  Zap, User, TrendingUp, Eye, LogOut, UserCog, Car, Trophy, ScrollText,
+  Zap, User, TrendingUp, Eye, LogOut, UserCog, Car, Trophy, ScrollText, Radio, FolderKanban,
 } from "lucide-react";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent,
@@ -21,21 +21,23 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { title: "Dashboard", url: "/", icon: LayoutDashboard, roles: ["admin", "coordinator", "technician"] },
+  { title: "Dashboard", url: "/", icon: LayoutDashboard, roles: ["admin", "coordinator", "technician", "manager", "hr"] },
   { title: "Tickets", url: "/tickets", icon: Ticket, roles: ["admin", "coordinator"] },
   { title: "Schedule", url: "/schedule", icon: Calendar, roles: ["admin", "coordinator"] },
-  { title: "Route Map", url: "/route-map", icon: Map, roles: ["admin", "coordinator", "technician"] },
+  { title: "Route Map", url: "/route-map", icon: Map, roles: ["admin", "coordinator", "technician", "manager", "hr"] },
   { title: "Customers", url: "/customers", icon: Users, roles: ["admin", "coordinator"] },
   { title: "Technicians", url: "/technicians", icon: Wrench, roles: ["admin", "coordinator"] },
   { title: "My Jobs", url: "/my-jobs", icon: ClipboardList, roles: ["technician"] },
   { title: "Inventory", url: "/inventory", icon: Package, roles: ["admin"] },
   { title: "Product Catalog", url: "/product-catalog", icon: ShoppingBag, roles: ["admin"] },
   { title: "Billing", url: "/billing", icon: DollarSign, roles: ["admin", "technician"] },
-  { title: "Travel Expenses", url: "/travel-expenses", icon: Car, roles: ["admin", "technician"] },
+  { title: "Expenses", url: "/travel-expenses", icon: Car, roles: ["admin", "technician", "coordinator", "manager", "hr"] },
+  { title: "Live Tracking", url: "/live-tracking", icon: Radio, roles: ["admin", "coordinator", "manager", "hr"] },
+  { title: "Projects", url: "/projects", icon: FolderKanban, roles: ["admin", "coordinator", "manager", "hr", "technician"] },
   { title: "Incentives", url: "/incentives", icon: Trophy, roles: ["admin", "technician"] },
   { title: "Reports", url: "/reports", icon: BarChart3, roles: ["admin"] },
-  { title: "My Profile", url: "/profile", icon: User, roles: ["admin", "coordinator", "technician"] },
-  { title: "My Performance", url: "/performance", icon: TrendingUp, roles: ["admin", "coordinator", "technician"] },
+  { title: "My Profile", url: "/profile", icon: User, roles: ["admin", "coordinator", "technician", "manager", "hr"] },
+  { title: "My Performance", url: "/performance", icon: TrendingUp, roles: ["admin", "coordinator", "technician", "manager", "hr"] },
   { title: "User Monitoring", url: "/user-monitoring", icon: Eye, roles: ["admin", "coordinator"] },
   { title: "User Management", url: "/users", icon: UserCog, roles: ["admin"] },
   { title: "Audit Logs", url: "/audit-logs", icon: ScrollText, roles: ["admin"] },

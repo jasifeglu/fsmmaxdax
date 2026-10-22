@@ -1,3 +1,4 @@
+import { ReportingManagerSelect } from "@/components/ReportingManagerSelect";
 import { useState, useEffect } from "react";
 import { PageHeader } from "@/components/PageHeader";
 import { Card, CardContent } from "@/components/ui/card";
@@ -196,6 +197,8 @@ const UsersPage = () => {
                     <SelectItem value="admin">Admin</SelectItem>
                     <SelectItem value="coordinator">Coordinator</SelectItem>
                     <SelectItem value="technician">Technician</SelectItem>
+<SelectItem value="manager">Reporting Manager</SelectItem>
+<SelectItem value="hr">HR</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -268,9 +271,12 @@ const UsersPage = () => {
                             <SelectItem value="admin">Admin</SelectItem>
                             <SelectItem value="coordinator">Coordinator</SelectItem>
                             <SelectItem value="technician">Technician</SelectItem>
+<SelectItem value="manager">Reporting Manager</SelectItem>
+<SelectItem value="hr">HR</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
+                      <div><Label className="text-[10px] text-muted-foreground">Reports to</Label><ReportingManagerSelect userId={u.id} users={users as any} className="w-full h-8 text-xs mt-1" /></div>
                       <div className="flex flex-wrap gap-2">
                         <Button variant="outline" size="sm" className="text-xs h-8 gap-1 flex-1" onClick={() => openResetDialog(u)}>
                           <KeyRound className="h-3 w-3" /> Change Password
@@ -307,6 +313,7 @@ const UsersPage = () => {
                         <th className="text-left py-2 font-medium">Email</th>
                         <th className="text-left py-2 font-medium">Status</th>
                         <th className="text-left py-2 font-medium">Role</th>
+                        <th className="text-left py-2 font-medium">Reports to</th>
                         <th className="text-left py-2 font-medium">Actions</th>
                       </tr>
                     </thead>
@@ -331,9 +338,12 @@ const UsersPage = () => {
                                 <SelectItem value="admin">Admin</SelectItem>
                                 <SelectItem value="coordinator">Coordinator</SelectItem>
                                 <SelectItem value="technician">Technician</SelectItem>
+<SelectItem value="manager">Reporting Manager</SelectItem>
+<SelectItem value="hr">HR</SelectItem>
                               </SelectContent>
                             </Select>
                           </td>
+                          <td className="py-2.5"><ReportingManagerSelect userId={u.id} users={users as any} /></td>
                           <td className="py-2.5">
                             <div className="flex items-center gap-1.5">
                               <Button variant="outline" size="sm" className="text-xs h-7 gap-1" onClick={() => openResetDialog(u)} title="Change Password">
