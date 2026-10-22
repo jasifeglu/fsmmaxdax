@@ -6,12 +6,15 @@ import { Search, FlaskConical } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { ProfileDropdown } from "@/components/ProfileDropdown";
 import { NotificationsDropdown } from "@/components/NotificationsDropdown";
+import { AttendanceControl } from "@/components/AttendanceControl";
 import { supabase } from "@/integrations/supabase/client";
 
 const roleTitles = {
   admin: "Admin Panel",
   coordinator: "Service Coordinator",
   technician: "Technician App",
+  manager: "Reporting Manager",
+  hr: "HR",
 };
 
 export const AppLayout = ({ children }: { children: ReactNode }) => {
@@ -61,6 +64,7 @@ export const AppLayout = ({ children }: { children: ReactNode }) => {
                   className="h-8 w-52 pl-8 text-xs bg-muted/50 border-none"
                 />
               </div>
+              <AttendanceControl />
               <NotificationsDropdown />
               <ProfileDropdown />
             </div>

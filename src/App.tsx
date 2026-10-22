@@ -32,6 +32,8 @@ const PerformancePage = lazy(() => import("./pages/PerformancePage"));
 const UserMonitoringPage = lazy(() => import("./pages/UserMonitoringPage"));
 const TravelExpensesPage = lazy(() => import("./pages/TravelExpensesPage"));
 const IncentivesPage = lazy(() => import("./pages/IncentivesPage"));
+const LiveTrackingPage = lazy(() => import("./pages/LiveTrackingPage"));
+const ProjectsPage = lazy(() => import("./pages/ProjectsPage"));
 const AuditLogsPage = lazy(() => import("./pages/AuditLogsPage"));
 
 const queryClient = new QueryClient();
@@ -62,13 +64,15 @@ const AppRoutes = () => {
           <Route path="/my-jobs" element={<RoleGuard allowed={["technician"]}><Index /></RoleGuard>} />
           <Route path="/inventory" element={<RoleGuard allowed={["admin"]}><InventoryPage /></RoleGuard>} />
           <Route path="/billing" element={<RoleGuard allowed={["admin", "technician"]}><BillingPage /></RoleGuard>} />
-          <Route path="/travel-expenses" element={<RoleGuard allowed={["admin", "technician"]}><TravelExpensesPage /></RoleGuard>} />
+          <Route path="/travel-expenses" element={<RoleGuard allowed={["admin", "technician", "coordinator", "manager", "hr"]}><TravelExpensesPage /></RoleGuard>} />
           <Route path="/reports" element={<RoleGuard allowed={["admin"]}><ReportsPage /></RoleGuard>} />
           <Route path="/incentives" element={<RoleGuard allowed={["admin", "technician"]}><IncentivesPage /></RoleGuard>} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/performance" element={<PerformancePage />} />
           <Route path="/user-monitoring" element={<RoleGuard allowed={["admin", "coordinator"]}><UserMonitoringPage /></RoleGuard>} />
           <Route path="/users" element={<RoleGuard allowed={["admin"]}><UsersPage /></RoleGuard>} />
+          <Route path="/live-tracking" element={<RoleGuard allowed={["admin", "coordinator", "manager", "hr"]}><LiveTrackingPage /></RoleGuard>} />
+          <Route path="/projects" element={<RoleGuard allowed={["admin", "coordinator", "manager", "hr", "technician"]}><ProjectsPage /></RoleGuard>} />
           <Route path="/audit-logs" element={<RoleGuard allowed={["admin"]}><AuditLogsPage /></RoleGuard>} />
           <Route path="/settings" element={<RoleGuard allowed={["admin"]}><SettingsPage /></RoleGuard>} />
           <Route path="*" element={<NotFound />} />
