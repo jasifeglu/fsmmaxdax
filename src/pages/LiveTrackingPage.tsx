@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import { PageHeader } from "@/components/PageHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -116,27 +116,27 @@ const LiveTrackingPage = () => {
 
         <Card className="glass-card lg:col-span-2 overflow-hidden order-1 lg:order-2">
           <div className="h-[420px] lg:h-[560px]">
-            <MapContainer center={center} zoom={11} style={{ height: "100%", width: "100%" }}>
-              <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution="&copy; OpenStreetMap" />
+            <MapContainer {...{ center, zoom: 11, style: { height: "100%", width: "100%" } } as any}>
+              <TileLayer {...{ url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", attribution: "&copy; OpenStreetMap" } as any} />
               <FlyTo pos={selLatest ? [Number(selLatest.latitude), Number(selLatest.longitude)] : null} />
               {staffIds.map((id) => {
                 const pts = byUser[id] || [];
                 const last = latest(id);
                 if (!last) return null;
                 return (
-                  <div key={id}>
+                  <Fragment key={id}>
                     {(selected === null || selected === id) && pts.length > 1 && (
                       <Polyline positions={pts.map((p) => [Number(p.latitude), Number(p.longitude)] as [number, number])}
                         pathOptions={{ color: "hsl(var(--primary))", weight: selected === id ? 4 : 2, opacity: 0.7 }} />
                     )}
-                    <Marker position={[Number(last.latitude), Number(last.longitude)]} icon={active[id] ? liveIcon : offIcon}>
+                    <Marker {...{ position: [Number(last.latitude), Number(last.longitude)], icon: active[id] ? liveIcon : offIcon } as any}>
                       <Popup>
                         <strong>{names[id] || "Staff"}</strong><br />
                         {new Date(last.recorded_at).toLocaleTimeString()}<br />
                         {pathKm(pts).toFixed(1)} km today
                       </Popup>
                     </Marker>
-                  </div>
+                  </Fragment>
                 );
               })}
             </MapContainer>
