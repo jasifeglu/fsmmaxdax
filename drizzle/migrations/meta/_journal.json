@@ -15,6 +15,13 @@
       "when": 1792396910186,
       "tag": "0001_geo_tracking_projects_expense_approvals",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792754756076,
+      "tag": "0002_create_travel_journeys",
+      "breakpoints": true
     }
   ]
 }

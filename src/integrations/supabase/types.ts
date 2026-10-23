@@ -865,6 +865,7 @@ export type Database = {
           accuracy: number | null
           attendance_id: string | null
           id: string
+          journey_id: string | null
           latitude: number
           longitude: number
           recorded_at: string
@@ -875,6 +876,7 @@ export type Database = {
           accuracy?: number | null
           attendance_id?: string | null
           id?: string
+          journey_id?: string | null
           latitude: number
           longitude: number
           recorded_at?: string
@@ -885,6 +887,7 @@ export type Database = {
           accuracy?: number | null
           attendance_id?: string | null
           id?: string
+          journey_id?: string | null
           latitude?: number
           longitude?: number
           recorded_at?: string
@@ -897,6 +900,13 @@ export type Database = {
             columns: ["attendance_id"]
             isOneToOne: false
             referencedRelation: "staff_attendance"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "staff_locations_journey_id_fkey"
+            columns: ["journey_id"]
+            isOneToOne: false
+            referencedRelation: "travel_journeys"
             referencedColumns: ["id"]
           },
         ]
@@ -1458,6 +1468,128 @@ export type Database = {
           },
           {
             foreignKeyName: "travel_expenses_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      travel_journeys: {
+        Row: {
+          approved_distance_m: number | null
+          attendance_id: string | null
+          business_purpose: string | null
+          created_at: string
+          dest_address: string | null
+          dest_lat: number | null
+          dest_lng: number | null
+          distance_quality: string | null
+          distance_source: string | null
+          ended_at: string | null
+          gps_distance_m: number
+          id: string
+          journey_type: string
+          notes: string | null
+          odometer_end: number | null
+          odometer_start: number | null
+          origin_address: string | null
+          origin_lat: number | null
+          origin_lng: number | null
+          project_id: string | null
+          reimbursement_eligible: boolean
+          return_of_journey_id: string | null
+          road_distance_m: number | null
+          started_at: string
+          status: string
+          ticket_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          approved_distance_m?: number | null
+          attendance_id?: string | null
+          business_purpose?: string | null
+          created_at?: string
+          dest_address?: string | null
+          dest_lat?: number | null
+          dest_lng?: number | null
+          distance_quality?: string | null
+          distance_source?: string | null
+          ended_at?: string | null
+          gps_distance_m?: number
+          id?: string
+          journey_type?: string
+          notes?: string | null
+          odometer_end?: number | null
+          odometer_start?: number | null
+          origin_address?: string | null
+          origin_lat?: number | null
+          origin_lng?: number | null
+          project_id?: string | null
+          reimbursement_eligible?: boolean
+          return_of_journey_id?: string | null
+          road_distance_m?: number | null
+          started_at?: string
+          status?: string
+          ticket_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          approved_distance_m?: number | null
+          attendance_id?: string | null
+          business_purpose?: string | null
+          created_at?: string
+          dest_address?: string | null
+          dest_lat?: number | null
+          dest_lng?: number | null
+          distance_quality?: string | null
+          distance_source?: string | null
+          ended_at?: string | null
+          gps_distance_m?: number
+          id?: string
+          journey_type?: string
+          notes?: string | null
+          odometer_end?: number | null
+          odometer_start?: number | null
+          origin_address?: string | null
+          origin_lat?: number | null
+          origin_lng?: number | null
+          project_id?: string | null
+          reimbursement_eligible?: boolean
+          return_of_journey_id?: string | null
+          road_distance_m?: number | null
+          started_at?: string
+          status?: string
+          ticket_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "travel_journeys_attendance_id_fkey"
+            columns: ["attendance_id"]
+            isOneToOne: false
+            referencedRelation: "staff_attendance"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "travel_journeys_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "travel_journeys_return_of_journey_id_fkey"
+            columns: ["return_of_journey_id"]
+            isOneToOne: false
+            referencedRelation: "travel_journeys"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "travel_journeys_ticket_id_fkey"
             columns: ["ticket_id"]
             isOneToOne: false
             referencedRelation: "tickets"
