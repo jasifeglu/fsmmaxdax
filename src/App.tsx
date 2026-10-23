@@ -33,6 +33,7 @@ const UserMonitoringPage = lazy(() => import("./pages/UserMonitoringPage"));
 const TravelExpensesPage = lazy(() => import("./pages/TravelExpensesPage"));
 const IncentivesPage = lazy(() => import("./pages/IncentivesPage"));
 const LiveTrackingPage = lazy(() => import("./pages/LiveTrackingPage"));
+const TravelPage = lazy(() => import("./pages/TravelPage"));
 const ProjectsPage = lazy(() => import("./pages/ProjectsPage"));
 const AuditLogsPage = lazy(() => import("./pages/AuditLogsPage"));
 
@@ -65,6 +66,7 @@ const AppRoutes = () => {
           <Route path="/inventory" element={<RoleGuard allowed={["admin"]}><InventoryPage /></RoleGuard>} />
           <Route path="/billing" element={<RoleGuard allowed={["admin", "technician"]}><BillingPage /></RoleGuard>} />
           <Route path="/travel-expenses" element={<RoleGuard allowed={["admin", "technician", "coordinator", "manager", "hr"]}><TravelExpensesPage /></RoleGuard>} />
+          <Route path="/travel" element={<RoleGuard allowed={["admin", "technician", "coordinator", "manager", "hr"]}><TravelPage /></RoleGuard>} />
           <Route path="/reports" element={<RoleGuard allowed={["admin"]}><ReportsPage /></RoleGuard>} />
           <Route path="/incentives" element={<RoleGuard allowed={["admin", "technician"]}><IncentivesPage /></RoleGuard>} />
           <Route path="/profile" element={<ProfilePage />} />

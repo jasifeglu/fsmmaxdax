@@ -4,7 +4,7 @@ import { useAuth, UserRole } from "@/contexts/AuthContext";
 import {
   LayoutDashboard, Ticket, Users, Wrench, Package, DollarSign,
   BarChart3, Settings, Calendar, ClipboardList, Map, ShoppingBag,
-  Zap, User, TrendingUp, Eye, LogOut, UserCog, Car, Trophy, ScrollText, Radio, FolderKanban,
+  Zap, User, TrendingUp, Eye, LogOut, UserCog, Car, Trophy, ScrollText, Radio, FolderKanban, Route as RouteIcon,
 } from "lucide-react";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent,
@@ -32,6 +32,7 @@ const navItems: NavItem[] = [
   { title: "Product Catalog", url: "/product-catalog", icon: ShoppingBag, roles: ["admin"] },
   { title: "Billing", url: "/billing", icon: DollarSign, roles: ["admin", "technician"] },
   { title: "Expenses", url: "/travel-expenses", icon: Car, roles: ["admin", "technician", "coordinator", "manager", "hr"] },
+  { title: "Travel", url: "/travel", icon: RouteIcon, roles: ["admin", "technician", "coordinator", "manager", "hr"] },
   { title: "Live Tracking", url: "/live-tracking", icon: Radio, roles: ["admin", "coordinator", "manager", "hr"] },
   { title: "Projects", url: "/projects", icon: FolderKanban, roles: ["admin", "coordinator", "manager", "hr", "technician"] },
   { title: "Incentives", url: "/incentives", icon: Trophy, roles: ["admin", "technician"] },
