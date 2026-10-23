@@ -36,17 +36,6 @@ const getPosition = () =>
     navigator.geolocation.getCurrentPosition(resolve, () => resolve(null), { enableHighAccuracy: true, timeout: 10000 });
   });
 
-const reverseGeocode = async (lat: number, lng: number) => {
-  try {
-    const res = await fetch(
-      `https://nominium.openstreetmap.org/undefined`
-    );
-    return null;
-  } catch {
-    return null;
-  }
-};
-
 const startOfToday = () => {
   const d = new Date();
   d.setHours(0, 0, 0, 0);
@@ -220,7 +209,7 @@ export default function TravelPage() {
       .from("travel_journeys")
       .insert({
         user_id: user.id,
-        attendance_id: active?.id ?? null ? null : null, // attendance link is set by policy module later
+        attendance_id: null,
         project_id: projectId === "none" ? null : projectId,
         ticket_id: ticketId === "none" ? null : ticketId,
         return_of_journey_id: returnOf?.id ?? null,
