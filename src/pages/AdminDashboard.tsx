@@ -3,6 +3,7 @@ import { PageHeader } from "@/components/PageHeader";
 import { DashboardKPICards } from "@/components/dashboard/DashboardKPICards";
 import { DashboardCharts } from "@/components/dashboard/DashboardCharts";
 import { TechnicianMonitorPanel } from "@/components/dashboard/TechnicianMonitorPanel";
+import { AttendanceTodayPanel } from "@/components/dashboard/AttendanceTodayPanel";
 import { LiveTicketMonitor } from "@/components/dashboard/LiveTicketMonitor";
 import { FinancialOverviewPanel } from "@/components/dashboard/FinancialOverviewPanel";
 import { InventoryAlertPanel } from "@/components/dashboard/InventoryAlertPanel";
@@ -79,6 +80,9 @@ export const AdminDashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
         <TechnicianMonitorPanel tickets={tickets} profiles={profiles} />
         <LiveTicketMonitor tickets={tickets} />
+      </div>
+      <div className="mb-6">
+        <AttendanceTodayPanel />
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
         <FinancialOverviewPanel invoices={invoices} />

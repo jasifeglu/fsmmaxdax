@@ -46,10 +46,10 @@ Rules: reuse existing tables/modules, backward-compatible migrations, backend-en
 Deferred pending user inputs: Zoho OAuth credentials, routing provider key (road distance stays "unavailable" until then), push notifications provider.
 
 ## Stage R — Production Repair & Sync (uploaded "PRODUCTION REPAIR COMPLETE" doc, Oct 24)
-- [ ] Diagnose: Naseeb attendance/GPS end-to-end (DB evidence first)
-- [ ] Fix employee identity mapping & attendance persistence
-- [ ] Fix GPS persistence & dashboard sync
-- [ ] Cross-account sync: RLS, realtime, refresh persistence
+- [x] Diagnose: Naseeb attendance/GPS end-to-end (DB evidence first)
+- [x] Fix employee identity mapping & attendance persistence (accounts verified correct; attendance panel added)
+- [x] Fix GPS persistence & dashboard sync (HR/manager GPS visibility policy + dashboards)
+- [x] Cross-account sync: RLS, realtime, refresh persistence (tech dashboard realtime added)
 - [ ] Audit remaining broken modules (buttons/forms/save/blank screens)
 - [ ] Android client (Google AI Studio app) integration contract
 - [ ] Final verification tests + report
