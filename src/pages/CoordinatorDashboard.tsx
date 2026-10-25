@@ -7,6 +7,7 @@ import { Ticket, Clock, AlertTriangle, Users, Calendar, Loader2 } from "lucide-r
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import { AttendanceTodayPanel } from "@/components/dashboard/AttendanceTodayPanel";
 
 export const CoordinatorDashboard = () => {
   const [tickets, setTickets] = useState<any[]>([]);
@@ -56,6 +57,10 @@ export const CoordinatorDashboard = () => {
         <StatCard title="Pending Tickets" value={pendingTickets.length} change={`${unassigned.length} unassigned`} changeType={unassigned.length > 0 ? "negative" : "neutral"} icon={Ticket} iconColor="text-warning" />
         <StatCard title="Technicians" value={profiles.length} icon={Users} iconColor="text-success" />
         <StatCard title="Urgent Alerts" value={urgentTickets.length} change={urgentTickets.length > 0 ? "Needs attention" : "All clear"} changeType={urgentTickets.length > 0 ? "negative" : "positive"} icon={AlertTriangle} iconColor="text-destructive" />
+      </div>
+
+      <div className="mb-6">
+        <AttendanceTodayPanel />
       </div>
 
       {urgentTickets.length > 0 && (
