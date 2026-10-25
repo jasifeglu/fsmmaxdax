@@ -90,16 +90,26 @@ export const AttendanceControl = () => {
   const checkOut = async () => {
     if (!active) return;
     setBusy(true);
-    const pos = await getPosition();
+    // Close the session immediately — never block check-out on a GPS fix
     const { error } = await supabase.from("staff_attendance").update({
       check_out_at: new Date().toISOString(),
-      check_out_lat: pos?.coords.latitude ?? null,
-      check_out_lng: pos?.coords.longitude ?? null,
     }).eq("id", active.id);
-    setBusy(false);
-    if (error) return toast({ title: "Check-out failed", description: error.message, variant: "destructive" });
+    if (error) {
+      setBusy(false);
+      return toast({ title: "Check-out failed", description: error.message, variant: "destructive" });
+    }
+    const attendanceId = active.id;
     setActive(null); lastRef.current = null;
+    setBusy(false);
     toast({ title: "Checked out", description: "Location sharing stopped." });
+    // Departure coordinates saved best-effort once a fix arrives
+    const pos = await getPosition();
+    if (pos) {
+      await supabase.from("staff_attendance").update({
+        check_out_lat: pos.coords.latitude,
+        check_out_lng: pos.coords.longitude,
+      }).eq("id", attendanceId);
+    }
   };
 
   if (!user) return null;
