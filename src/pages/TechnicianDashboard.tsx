@@ -52,6 +52,16 @@ export const TechnicianDashboard = () => {
 
     fetchJobs();
     fetchSettings();
+
+    // Live updates: newly assigned / rescheduled / completed tickets appear without refresh
+    const channel = supabase
+      .channel(`tech-jobs-${user?.id}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "tickets" }, (payload: any) => {
+        const row = payload.new ?? payload.old;
+        if (row?.assigned_to === user?.id) fetchJobs();
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
   }, [user?.id]);
 
   const startCamera = async (ticketId: string) => {
