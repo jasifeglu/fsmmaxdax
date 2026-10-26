@@ -113,7 +113,7 @@ export const TechnicianDashboard = () => {
     }
 
     // Save check-in record (store the path, not a public URL)
-    await supabase.from("selfie_checkins").insert({
+    const { error: checkinError } = await supabase.from("selfie_checkins").insert({
       user_id: user.id,
       ticket_id: selfieTicketId,
       checkin_type: "check_in",
@@ -121,6 +121,11 @@ export const TechnicianDashboard = () => {
       latitude: lat,
       longitude: lng,
     });
+    if (checkinError) {
+      toast({ title: "Could not save check-in", description: checkinError.message, variant: "destructive" });
+      setCapturing(false);
+      return;
+    }
 
     toast({ title: "Checked in successfully!" });
     setCapturing(false);
