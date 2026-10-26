@@ -181,10 +181,13 @@ export const InvoiceForm = ({ onCreated }: Props) => {
       };
     });
 
-    await supabase.from("invoice_items").insert(lineItems);
-
+    const { error: itemsError } = await supabase.from("invoice_items").insert(lineItems);
     setSaving(false);
-    toast({ title: `Invoice ${invoiceNumber} created!` });
+    if (itemsError) {
+      toast({ title: `Invoice ${invoiceNumber} saved but line items failed`, description: itemsError.message, variant: "destructive" });
+    } else {
+      toast({ title: `Invoice ${invoiceNumber} created!` });
+    }
     setOpen(false);
     onCreated();
   };

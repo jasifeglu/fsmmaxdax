@@ -73,8 +73,12 @@ export const StockIssuance = ({ items, onRefresh }: Props) => {
     const newWarehouse = item.warehouse_stock - form.quantity;
     const newVan = item.van_stock + form.quantity;
     const status = newWarehouse <= 0 ? "Critical" : newWarehouse < item.min_stock ? "Low" : "OK";
-    await supabase.from("inventory").update({ warehouse_stock: newWarehouse, van_stock: newVan, status }).eq("id", form.inventory_id);
-
+    const { error: stockError } = await supabase.from("inventory").update({ warehouse_stock: newWarehouse, van_stock: newVan, status }).eq("id", form.inventory_id);
+    if (stockError) {
+      setIssuing(false);
+      toast({ title: "Transaction saved but stock not updated", description: stockError.message, variant: "destructive" });
+      return;
+    }
     setIssuing(false);
     toast({ title: `Issued ${form.quantity} units to technician` });
     setDialogOpen(false);
