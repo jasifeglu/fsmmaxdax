@@ -53,6 +53,8 @@ export const IncentiveRulesAdmin = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const { toast } = useToast();
 
+  const [saving, setSaving] = useState(false);
+
   const fetchRules = async () => {
     const { data } = await supabase.from("incentive_rules").select("*").order("created_at");
     if (data) setRules(data as IncentiveRule[]);

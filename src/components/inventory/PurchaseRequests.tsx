@@ -16,6 +16,8 @@ export const PurchaseRequests = ({ items }: Props) => {
   const { user, role } = useAuth();
   const [requests, setRequests] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [suggesting, setSuggesting] = useState(false);
+  const [approving, setApproving] = useState(false);
 
   const fetchRequests = async () => {
     setLoading(true);
@@ -83,8 +85,8 @@ export const PurchaseRequests = ({ items }: Props) => {
             <ShoppingCart className="h-4 w-4 text-primary" /> Purchase Requests
           </CardTitle>
           {role === "admin" && (
-            <Button size="sm" variant="outline" className="h-8 text-xs" onClick={autoSuggest}>
-              Auto-Suggest for Low Stock
+            <Button size="sm" variant="outline" className="h-8 text-xs" onClick={autoSuggest} disabled={suggesting}>
+              {suggesting ? "Creating..." : "Auto-Suggest for Low Stock"}
             </Button>
           )}
         </div>
