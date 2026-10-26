@@ -29,6 +29,13 @@
       "when": 1792902179084,
       "tag": "0003_staff_locations_hr_manager_visibility",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1792986809660,
+      "tag": "0004_realtime_publication_business_tables",
+      "breakpoints": true
     }
   ]
 }
