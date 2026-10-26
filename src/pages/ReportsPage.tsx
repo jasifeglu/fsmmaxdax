@@ -48,6 +48,13 @@ const ReportsPage = () => {
       setProfiles(pRes.data || []);
     };
     fetch();
+    // Live: reports follow ticket and invoice changes from any account
+    const ch = supabase
+      .channel("reports-live")
+      .on("postgres_changes", { event: "*", schema: "public", table: "tickets" }, () => fetch())
+      .on("postgres_changes", { event: "*", schema: "public", table: "invoices" }, () => fetch())
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
   }, []);
 
   // Real KPI stats

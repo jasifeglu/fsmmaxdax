@@ -53,12 +53,13 @@ export const TechnicianDashboard = () => {
     fetchJobs();
     fetchSettings();
 
-    // Live updates: newly assigned / rescheduled / completed tickets appear without refresh
+    // Live updates: newly assigned / rescheduled / reassigned / completed tickets appear without refresh
     const channel = supabase
       .channel(`tech-jobs-${user?.id}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "tickets" }, (payload: any) => {
-        const row = payload.new ?? payload.old;
-        if (row?.assigned_to === user?.id) fetchJobs();
+        const oldRow = payload.old ?? {};
+        const newRow = payload.new ?? {};
+        if (newRow.assigned_to === user?.id || oldRow.assigned_to === user?.id) fetchJobs();
       })
       .subscribe();
     return () => { supabase.removeChannel(channel); };
@@ -113,7 +114,7 @@ export const TechnicianDashboard = () => {
     }
 
     // Save check-in record (store the path, not a public URL)
-    await supabase.from("selfie_checkins").insert({
+    const { error: checkinError } = await supabase.from("selfie_checkins").insert({
       user_id: user.id,
       ticket_id: selfieTicketId,
       checkin_type: "check_in",
@@ -121,6 +122,11 @@ export const TechnicianDashboard = () => {
       latitude: lat,
       longitude: lng,
     });
+    if (checkinError) {
+      toast({ title: "Could not save check-in", description: checkinError.message, variant: "destructive" });
+      setCapturing(false);
+      return;
+    }
 
     toast({ title: "Checked in successfully!" });
     setCapturing(false);

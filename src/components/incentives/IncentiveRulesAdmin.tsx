@@ -53,6 +53,8 @@ export const IncentiveRulesAdmin = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const { toast } = useToast();
 
+  const [saving, setSaving] = useState(false);
+
   const fetchRules = async () => {
     const { data } = await supabase.from("incentive_rules").select("*").order("created_at");
     if (data) setRules(data as IncentiveRule[]);
@@ -68,11 +70,15 @@ export const IncentiveRulesAdmin = () => {
   };
 
   const save = async () => {
-    if (!form.name) return;
-    if (editing) {
-      await supabase.from("incentive_rules").update(form).eq("id", editing.id);
-    } else {
-      await supabase.from("incentive_rules").insert(form);
+    if (!form.name || saving) return;
+    setSaving(true);
+    const { error } = editing
+      ? await supabase.from("incentive_rules").update(form).eq("id", editing.id)
+      : await supabase.from("incentive_rules").insert(form);
+    setSaving(false);
+    if (error) {
+      toast({ title: editing ? "Could not update rule" : "Could not create rule", description: error.message, variant: "destructive" });
+      return;
     }
     toast({ title: editing ? "Rule updated" : "Rule created" });
     setDialogOpen(false);
@@ -80,13 +86,21 @@ export const IncentiveRulesAdmin = () => {
   };
 
   const remove = async (id: string) => {
-    await supabase.from("incentive_rules").delete().eq("id", id);
+    const { error } = await supabase.from("incentive_rules").delete().eq("id", id);
+    if (error) {
+      toast({ title: "Could not delete rule", description: error.message, variant: "destructive" });
+      return;
+    }
     toast({ title: "Rule deleted" });
     fetchRules();
   };
 
   const toggleActive = async (rule: IncentiveRule) => {
-    await supabase.from("incentive_rules").update({ is_active: !rule.is_active }).eq("id", rule.id);
+    const { error } = await supabase.from("incentive_rules").update({ is_active: !rule.is_active }).eq("id", rule.id);
+    if (error) {
+      toast({ title: "Could not update rule", description: error.message, variant: "destructive" });
+      return;
+    }
     fetchRules();
   };
 

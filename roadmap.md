@@ -50,6 +50,6 @@ Deferred pending user inputs: Zoho OAuth credentials, routing provider key (road
 - [x] Fix employee identity mapping & attendance persistence (accounts verified correct; attendance panel added)
 - [x] Fix GPS persistence & dashboard sync (HR/manager GPS visibility policy + dashboards)
 - [x] Cross-account sync: RLS, realtime, refresh persistence (tech dashboard realtime added)
-- [ ] Audit remaining broken modules (buttons/forms/save/blank screens)
+- [x] Audit remaining broken modules (full source audit done; high-severity fixes applied)
 - [ ] Android client (Google AI Studio app) integration contract
-- [ ] Final verification tests + report
+- [x] Final verification tests + report (tests pass, build OK; Android code still pending user upload)

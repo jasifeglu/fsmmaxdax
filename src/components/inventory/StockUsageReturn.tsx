@@ -53,7 +53,7 @@ export const StockUsageReturn = ({ items, onRefresh }: Props) => {
       return;
     }
     setSubmitting(true);
-    await supabase.from("inventory_transactions").insert({
+    const { error: txnError } = await supabase.from("inventory_transactions").insert({
       inventory_id: usageForm.inventory_id,
       transaction_type: "usage",
       quantity: usageForm.quantity,
@@ -64,8 +64,18 @@ export const StockUsageReturn = ({ items, onRefresh }: Props) => {
       ticket_id: usageForm.ticket_id || null,
       notes: usageForm.notes,
     });
+    if (txnError) {
+      setSubmitting(false);
+      toast({ title: "Could not record usage", description: txnError.message, variant: "destructive" });
+      return;
+    }
     const newVan = item.van_stock - usageForm.quantity;
-    await supabase.from("inventory").update({ van_stock: newVan }).eq("id", usageForm.inventory_id);
+    const { error: stockError } = await supabase.from("inventory").update({ van_stock: newVan }).eq("id", usageForm.inventory_id);
+    if (stockError) {
+      setSubmitting(false);
+      toast({ title: "Usage saved but stock not updated", description: stockError.message, variant: "destructive" });
+      return;
+    }
     setSubmitting(false);
     toast({ title: "Usage recorded" });
     setUsageOpen(false);
@@ -85,7 +95,7 @@ export const StockUsageReturn = ({ items, onRefresh }: Props) => {
       return;
     }
     setSubmitting(true);
-    await supabase.from("inventory_transactions").insert({
+    const { error: txnError } = await supabase.from("inventory_transactions").insert({
       inventory_id: returnForm.inventory_id,
       transaction_type: "return",
       quantity: returnForm.quantity,
@@ -95,10 +105,20 @@ export const StockUsageReturn = ({ items, onRefresh }: Props) => {
       performed_by: user?.id,
       notes: returnForm.notes,
     });
+    if (txnError) {
+      setSubmitting(false);
+      toast({ title: "Could not record return", description: txnError.message, variant: "destructive" });
+      return;
+    }
     const newWarehouse = item.warehouse_stock + returnForm.quantity;
     const newVan = Math.max(0, item.van_stock - returnForm.quantity);
     const status = newWarehouse <= 0 ? "Critical" : newWarehouse < item.min_stock ? "Low" : "OK";
-    await supabase.from("inventory").update({ warehouse_stock: newWarehouse, van_stock: newVan, status }).eq("id", returnForm.inventory_id);
+    const { error: stockError } = await supabase.from("inventory").update({ warehouse_stock: newWarehouse, van_stock: newVan, status }).eq("id", returnForm.inventory_id);
+    if (stockError) {
+      setSubmitting(false);
+      toast({ title: "Return saved but stock not updated", description: stockError.message, variant: "destructive" });
+      return;
+    }
     setSubmitting(false);
     toast({ title: "Stock returned to warehouse" });
     setReturnOpen(false);

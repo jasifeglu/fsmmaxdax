@@ -29,6 +29,12 @@ const SchedulePage = () => {
       setLoading(false);
     };
     load();
+    // Live: schedule changes made by coordinators/admin appear instantly
+    const ch = supabase
+      .channel("schedule-live")
+      .on("postgres_changes", { event: "*", schema: "public", table: "tickets" }, () => load())
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
   }, []);
 
   const filtered = selectedTech === "all" ? tickets : tickets.filter(t => t.assigned_to === selectedTech);

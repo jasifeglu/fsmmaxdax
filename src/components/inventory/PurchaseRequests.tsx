@@ -16,6 +16,8 @@ export const PurchaseRequests = ({ items }: Props) => {
   const { user, role } = useAuth();
   const [requests, setRequests] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [suggesting, setSuggesting] = useState(false);
+  const [approving, setApproving] = useState(false);
 
   const fetchRequests = async () => {
     setLoading(true);
@@ -28,31 +30,45 @@ export const PurchaseRequests = ({ items }: Props) => {
 
   // Auto-suggest purchase requests for low stock items
   const autoSuggest = async () => {
+    if (suggesting) return;
+    setSuggesting(true);
     const lowItems = items.filter(i => i.status !== "OK");
     let created = 0;
+    let failed = 0;
     for (const item of lowItems) {
       const existing = requests.find(r => r.inventory_id === item.id && r.status === "pending");
       if (!existing) {
-        await supabase.from("purchase_requests").insert({
+        const { error } = await supabase.from("purchase_requests").insert({
           inventory_id: item.id,
           requested_quantity: item.min_stock * 2,
           reason: "low_stock",
           requested_by: user?.id,
           notes: `Auto-suggested: ${item.name} is ${item.status}`,
         });
-        created++;
+        if (error) { failed++; console.error("purchase_requests insert failed:", error.message); }
+        else created++;
       }
     }
+    setSuggesting(false);
     if (created > 0) {
       toast({ title: `${created} purchase request(s) created` });
       fetchRequests();
+    } else if (failed > 0) {
+      toast({ title: "Could not create requests", description: `${failed} failed. Check stock permissions and try again.`, variant: "destructive" });
     } else {
       toast({ title: "No new requests needed" });
     }
   };
 
   const handleApproval = async (id: string, newStatus: "approved" | "rejected") => {
-    await supabase.from("purchase_requests").update({ status: newStatus, approved_by: user?.id, updated_at: new Date().toISOString() }).eq("id", id);
+    if (approving) return;
+    setApproving(true);
+    const { error } = await supabase.from("purchase_requests").update({ status: newStatus, approved_by: user?.id, updated_at: new Date().toISOString() }).eq("id", id);
+    setApproving(false);
+    if (error) {
+      toast({ title: "Could not update request", description: error.message, variant: "destructive" });
+      return;
+    }
     toast({ title: `Request ${newStatus}` });
     fetchRequests();
   };
@@ -69,8 +85,8 @@ export const PurchaseRequests = ({ items }: Props) => {
             <ShoppingCart className="h-4 w-4 text-primary" /> Purchase Requests
           </CardTitle>
           {role === "admin" && (
-            <Button size="sm" variant="outline" className="h-8 text-xs" onClick={autoSuggest}>
-              Auto-Suggest for Low Stock
+            <Button size="sm" variant="outline" className="h-8 text-xs" onClick={autoSuggest} disabled={suggesting}>
+              {suggesting ? "Creating..." : "Auto-Suggest for Low Stock"}
             </Button>
           )}
         </div>

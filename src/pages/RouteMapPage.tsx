@@ -70,6 +70,12 @@ const RouteMapPage = () => {
       setLoading(false);
     };
     load();
+    // Live: route map follows ticket assignments and status changes
+    const ch = supabase
+      .channel("route-map-live")
+      .on("postgres_changes", { event: "*", schema: "public", table: "tickets" }, () => load())
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
   }, []);
 
   const activeTickets = useMemo(() => {

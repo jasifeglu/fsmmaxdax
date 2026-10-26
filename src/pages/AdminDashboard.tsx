@@ -38,10 +38,12 @@ export const AdminDashboard = () => {
 
   useEffect(() => {
     fetchAll();
-    // Realtime refresh on ticket changes
+    // Realtime refresh on ticket, invoice and inventory changes from any account
     const channel = supabase
       .channel("dashboard-live")
       .on("postgres_changes", { event: "*", schema: "public", table: "tickets" }, () => fetchAll())
+      .on("postgres_changes", { event: "*", schema: "public", table: "invoices" }, () => fetchAll())
+      .on("postgres_changes", { event: "*", schema: "public", table: "inventory" }, () => fetchAll())
       .subscribe();
     return () => { supabase.removeChannel(channel); };
   }, []);
