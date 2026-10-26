@@ -56,6 +56,15 @@ const TravelExpensesPage = () => {
 
   useEffect(() => { fetchAll(); }, [user?.id]);
 
+  // Cross-account live updates: new submissions and approval decisions by others appear instantly
+  useEffect(() => {
+    const ch = supabase
+      .channel(`expenses-live-${user?.id}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "travel_expenses" }, () => fetchAll())
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, [user?.id]);
+
   const detectLocation = () => {
     navigator.geolocation?.getCurrentPosition(
       (p) => setForm((f: any) => ({ ...f, location: `${p.coords.latitude.toFixed(5)}, ${p.coords.longitude.toFixed(5)}` })),
